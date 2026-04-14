@@ -1489,6 +1489,72 @@ const upgrades = [
         isUnlocked: false,
         element: null
     },
+    // === MPS-SCALING CLICK UPGRADES ===
+    {
+        id: 'mana-tap',
+        name: 'Mana Tap',
+        description: 'Each click also grants 1% of your Mana per second.',
+        flavorText: 'Your touch draws from the same streams that feed your buildings.',
+        cost: 5000000,
+        effect: () => { },
+        isPurchased: false,
+        unlockCondition: () => manaPerSecond >= 1000,
+        isUnlocked: false,
+        element: null,
+        clickMPSPercent: 0.01
+    },
+    {
+        id: 'deeper-tap',
+        name: 'Deeper Tap',
+        description: 'Each click also grants 3% of your Mana per second.',
+        flavorText: 'You reach deeper into the current. Each tap pulls more than the last.',
+        cost: 100000000,
+        effect: () => { },
+        isPurchased: false,
+        unlockCondition: () => upgrades.find(u => u.id === 'mana-tap')?.isPurchased,
+        isUnlocked: false,
+        element: null,
+        clickMPSPercent: 0.03
+    },
+    {
+        id: 'arcane-siphon',
+        name: 'Arcane Siphon',
+        description: 'Each click also grants 5% of your Mana per second.',
+        flavorText: 'Your fingers have become conduits. The Mana flows through you whether you will it or not.',
+        cost: 5000000000,
+        effect: () => { },
+        isPurchased: false,
+        unlockCondition: () => upgrades.find(u => u.id === 'deeper-tap')?.isPurchased,
+        isUnlocked: false,
+        element: null,
+        clickMPSPercent: 0.05
+    },
+    {
+        id: 'transcendent-tap',
+        name: 'Transcendent Tap',
+        description: 'Each click also grants 10% of your Mana per second.',
+        flavorText: 'A single tap from you now rivals what an entire guild produces in a heartbeat.',
+        cost: 500000000000,
+        effect: () => { },
+        isPurchased: false,
+        unlockCondition: () => upgrades.find(u => u.id === 'arcane-siphon')?.isPurchased,
+        isUnlocked: false,
+        element: null,
+        clickMPSPercent: 0.10
+    },
+    {
+        id: 'godhand',
+        name: 'Godhand',
+        description: 'Each click also grants 20% of your Mana per second.',
+        flavorText: 'The universe trembles with each tap. You are no longer gathering Mana. You are creating it.',
+        cost: 50000000000000,
+        effect: () => { },
+        isPurchased: false,
+        unlockCondition: () => upgrades.find(u => u.id === 'transcendent-tap')?.isPurchased,
+        isUnlocked: false,
+        element: null,
+        clickMPSPercent: 0.20
+    },
     // === MANA MANIPULATOR UPGRADES ===
     {
         id: 'forbidden-techniques',
@@ -2085,7 +2151,12 @@ function updateDisplay() {
     } else {
         mpsDisplay.textContent = `${OptionsModule.formatNumber(effectiveMPS)} MPS`;
     }
-    mpcDisplay.textContent = `${OptionsModule.formatNumber(Math.floor(manaPerClick))} per click`;
+    // Show effective click value including MPS-scaling bonus
+    let displayMPC = manaPerClick;
+    let mpsClickBonus = 0;
+    upgrades.forEach(u => { if (u.isPurchased && u.clickMPSPercent) mpsClickBonus += u.clickMPSPercent; });
+    if (mpsClickBonus > 0) displayMPC += effectiveMPS * mpsClickBonus;
+    mpcDisplay.textContent = `${OptionsModule.formatNumber(Math.floor(displayMPC))} per click`;
 
     // Update proficiency display
     if (typeof WizardRankModule !== 'undefined') {
@@ -2150,9 +2221,19 @@ function gatherMana() {
     // Ensure MPC doesn't go below 1
     if (effectiveMPC < 1) effectiveMPC = 1;
 
-    mana += effectiveMPC;
-    StatisticsModule.addManaByClick(effectiveMPC);
-    showFloatingNumber(effectiveMPC);
+    // Add MPS-scaling click bonus from upgrades (Mana Tap chain)
+    let mpsClickBonus = 0;
+    const effectiveMPS = typeof getEffectiveMPS === 'function' ? getEffectiveMPS() : manaPerSecond;
+    upgrades.forEach(u => {
+        if (u.isPurchased && u.clickMPSPercent) {
+            mpsClickBonus += u.clickMPSPercent;
+        }
+    });
+    const totalClick = effectiveMPC + (effectiveMPS * mpsClickBonus);
+
+    mana += totalClick;
+    StatisticsModule.addManaByClick(totalClick);
+    showFloatingNumber(totalClick);
     if (typeof TutorialModule !== 'undefined') TutorialModule.checkTriggers('firstClick');
     updateDisplay();
 }
@@ -2797,6 +2878,11 @@ function gameLoop() {
             if (typeof SpellcastingModule !== 'undefined') autoMPC *= SpellcastingModule.getMPCMultiplier();
             if (typeof ChallengesModule !== 'undefined') autoMPC *= ChallengesModule.getMPCMultiplier();
             if (autoMPC < 1) autoMPC = 1;
+            // Add MPS-scaling click bonus
+            let autoMPSBonus = 0;
+            upgrades.forEach(u => { if (u.isPurchased && u.clickMPSPercent) autoMPSBonus += u.clickMPSPercent; });
+            const autoEffectiveMPS = getEffectiveMPS();
+            autoMPC += autoEffectiveMPS * autoMPSBonus;
             mana += autoMPC;
             StatisticsModule.addManaByClick(autoMPC);
         }
