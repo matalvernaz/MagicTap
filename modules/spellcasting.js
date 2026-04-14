@@ -57,13 +57,13 @@ const SpellcastingModule = (function() {
         {
             id: 'click-sacrifices',
             name: 'Click Sacrifices',
-            description: 'MPS increased by 4x, but MPC halved for 60 seconds.',
+            description: 'MPS increased by 3x, but clicking is disabled for 45 seconds.',
             cost: 8,
-            duration: 60,
+            duration: 45,
             effect: {
                 type: 'clickSacrifices',
-                mpsMultiplier: 4,
-                mpcMultiplier: 0.5
+                mpsMultiplier: 3,
+                mpcMultiplier: 0
             }
         },
         {
