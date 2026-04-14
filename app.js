@@ -313,8 +313,8 @@ const buildings = [
         description: 'Worship the weave for boons from the weave.',
         flavorText: 'The weave is the foremost on magic, so you must learn from it what your mortal mind can.',
         baseCost: 70000000,
-        baseProduction: 12500,
-        productionPerSecond: 12500,
+        baseProduction: 8200,
+        productionPerSecond: 8200,
         owned: 0,
         unlockCondition: () => mana >= 55000000,
         isUnlocked: false,
@@ -326,8 +326,8 @@ const buildings = [
         description: 'Magi come together to share mystical knowledge.',
         flavorText: 'A grand structure dedicated to learning magic from others.',
         baseCost: 450000000,
-        baseProduction: 125000,
-        productionPerSecond: 125000,
+        baseProduction: 40000,
+        productionPerSecond: 40000,
         owned: 0,
         unlockCondition: () => mana >= 100000000,
         isUnlocked: false,
@@ -2155,7 +2155,7 @@ function updateDisplay() {
     let displayMPC = manaPerClick;
     let mpsClickBonus = 0;
     upgrades.forEach(u => { if (u.isPurchased && u.clickMPSPercent) mpsClickBonus += u.clickMPSPercent; });
-    if (mpsClickBonus > 0) displayMPC += effectiveMPS * mpsClickBonus;
+    if (mpsClickBonus > 0) displayMPC += manaPerSecond * mpsClickBonus;
     mpcDisplay.textContent = `${OptionsModule.formatNumber(Math.floor(displayMPC))} per click`;
 
     // Update proficiency display
@@ -2222,14 +2222,14 @@ function gatherMana() {
     if (effectiveMPC < 1) effectiveMPC = 1;
 
     // Add MPS-scaling click bonus from upgrades (Mana Tap chain)
+    // Uses base MPS (before spell multipliers) to prevent Click Sacrifices from boosting clicks
     let mpsClickBonus = 0;
-    const effectiveMPS = typeof getEffectiveMPS === 'function' ? getEffectiveMPS() : manaPerSecond;
     upgrades.forEach(u => {
         if (u.isPurchased && u.clickMPSPercent) {
             mpsClickBonus += u.clickMPSPercent;
         }
     });
-    const totalClick = effectiveMPC + (effectiveMPS * mpsClickBonus);
+    const totalClick = effectiveMPC + (manaPerSecond * mpsClickBonus);
 
     mana += totalClick;
     StatisticsModule.addManaByClick(totalClick);
@@ -2881,8 +2881,7 @@ function gameLoop() {
             // Add MPS-scaling click bonus
             let autoMPSBonus = 0;
             upgrades.forEach(u => { if (u.isPurchased && u.clickMPSPercent) autoMPSBonus += u.clickMPSPercent; });
-            const autoEffectiveMPS = getEffectiveMPS();
-            autoMPC += autoEffectiveMPS * autoMPSBonus;
+            autoMPC += manaPerSecond * autoMPSBonus;
             mana += autoMPC;
             StatisticsModule.addManaByClick(autoMPC);
         }
@@ -2935,6 +2934,10 @@ function gameLoop() {
         // Apply Golden Eye spell multiplier
         if (typeof SpellcastingModule !== 'undefined') {
             coinRate *= SpellcastingModule.getWishingWellMultiplier();
+        }
+        // Apply Well Keeper prestige upgrade
+        if (typeof PrestigeModule !== 'undefined' && PrestigeModule.hasWellBoost && PrestigeModule.hasWellBoost()) {
+            coinRate *= 2;
         }
         WishingWellModule.addCoins(coinRate / 10); // Divide by 10 since loop runs 10x per second
         WishingWellModule.updateDisplay();

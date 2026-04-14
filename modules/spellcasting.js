@@ -69,12 +69,12 @@ const SpellcastingModule = (function() {
         {
             id: 'golden-eye',
             name: 'Golden Eye',
-            description: 'Wishing Well coins gain doubled for 30 seconds.',
+            description: 'Wishing Well coins gain tripled for 60 seconds.',
             cost: 4,
-            duration: 30,
+            duration: 60,
             effect: {
                 type: 'wishingWellBonus',
-                value: 2
+                value: 3
             }
         },
         {

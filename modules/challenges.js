@@ -47,12 +47,12 @@ const ChallengesModule = (function() {
             name: 'Raw Power',
             description: 'Upgrades cannot be purchased. Reach 500,000 Mana.',
             restriction: 'No upgrades can be bought this run.',
-            reward: 'All buildings permanently cost 5% less.',
-            rewardDescription: '-5% building costs',
+            reward: 'All buildings permanently cost 15% less.',
+            rewardDescription: '-15% building costs',
             goal: 500000,
             isCompleted: false,
             restrictionType: 'no-upgrades',
-            rewardEffect: { type: 'buildingCostReduction', value: 0.95 }
+            rewardEffect: { type: 'buildingCostReduction', value: 0.85 }
         },
         {
             id: 'diminishing',
