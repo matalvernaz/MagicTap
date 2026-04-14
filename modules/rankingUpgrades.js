@@ -56,7 +56,7 @@ const RankingUpgradesModule = (function() {
         { id: 'familiar-lightning-elemental', name: 'Lightning Elemental', cost: 500000000000, mpsBoost: 0.02 },
         { id: 'familiar-animated-armor', name: 'Animated Armor', cost: 999999999999, mpsBoost: 0.03 },
         { id: 'familiar-chimera', name: 'Chimera', cost: 9000000000000, mpsBoost: 0.02 },
-        { id: 'familiar-fire-elemental', name: 'Fire Elemental', cost: 9000000000000, mpsBoost: 0.01 },
+        { id: 'familiar-fire-elemental', name: 'Fire Elemental', cost: 45000000000, mpsBoost: 0.01 },
         { id: 'familiar-light-elemental', name: 'Light Elemental', cost: 90000000000000, mpsBoost: 0.02 },
         { id: 'familiar-dark-elemental', name: 'Dark Elemental', cost: 90000000000000, mpsBoost: 0.02 },
         { id: 'familiar-lunar-elemental', name: 'Lunar Elemental', cost: 900000000000000, mpsBoost: 0.03 },
