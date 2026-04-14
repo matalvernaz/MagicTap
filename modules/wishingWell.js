@@ -42,27 +42,27 @@ const WishingWellModule = (function() {
         {
             id: 'coin-shower',
             name: 'Coin Shower',
-            description: 'Instantly gain 6 Wishing Well coins.',
-            cost: 3,
+            description: 'Instantly gain 8 Wishing Well coins.',
+            cost: 5,
             duration: 0,
             isPositive: true,
             isInstant: true,
             backfireId: 'coin-tax',
             apply: function() {
-                coins = Math.min(coins + 6, maxCoins);
+                coins = Math.min(coins + 8, maxCoins);
             }
         },
         {
             id: 'coin-tax',
             name: 'Coin Tax',
-            description: 'Lose 3 Wishing Well coins.',
+            description: 'Lose 5 Wishing Well coins.',
             cost: 0,
             duration: 0,
             isPositive: false,
             isBackfire: true,
             isInstant: true,
             apply: function() {
-                coins = Math.max(0, coins - 3);
+                coins = Math.max(0, coins - 5);
             }
         },
         {
