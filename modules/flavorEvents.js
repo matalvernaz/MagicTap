@@ -148,6 +148,70 @@ const FlavorEventsModule = (function() {
         }
     ];
 
+    // Story milestones - one-time narrative events at key progression points
+    const storyMilestones = [
+        { id: 'story-100', condition: () => mana >= 100, text: 'The Mana feels less foreign now. Your hands remember the motions, your mind the patterns. You are no longer fumbling in the dark \u2014 you are learning.' },
+        { id: 'story-first-eye', condition: () => buildings.find(b => b.id === 'wizards-eye')?.owned >= 1, text: 'Your first Wizard\'s Eye opens, and the world shifts. You can see the currents of Mana flowing through everything \u2014 the walls, the floor, the air itself. How did you ever live without this sight?' },
+        { id: 'story-1000', condition: () => mana >= 1000, text: 'A thousand Mana. A week ago, you could not have imagined this much power. Other wizards are beginning to take notice of you.' },
+        { id: 'story-first-magus', condition: () => buildings.find(b => b.id === 'magus')?.owned >= 1, text: 'Your first Magus arrives \u2014 a fellow practitioner drawn by the growing concentration of Mana around your domain. "Impressive work for a novice," they say. You decide to take it as a compliment.' },
+        { id: 'story-10000', condition: () => mana >= 10000, text: 'Word of your abilities has spread beyond the local villages. Travelers come seeking enchantments, merchants offer rare components. You are becoming someone of consequence.' },
+        { id: 'story-ley-line', condition: () => buildings.find(b => b.id === 'ley-line')?.owned >= 1, text: 'You tap your first Ley Line and gasp. The raw power flowing beneath the earth dwarfs anything you have gathered by hand. The planet itself is a wellspring of magic, and you have learned to drink from it.' },
+        { id: 'story-100000', condition: () => mana >= 100000, text: 'Your tower rises above the treeline now, visible for miles. At night, it glows faintly purple. Apprentices have begun arriving uninvited. You suppose you should teach them something.' },
+        { id: 'story-million', condition: () => mana >= 1000000, text: 'A million Mana. The Council of Wizards has sent an emissary. They wish to know your intentions. You tell them you are merely a student of the arcane. They do not look convinced.' },
+        { id: 'story-church', condition: () => buildings.find(b => b.id === 'church-of-mana')?.owned >= 1, text: 'The Church of Mana opens its doors. Worshippers come to pay tribute to the Weave itself \u2014 and, perhaps, to you. It is an uncomfortable thought. You are no god. Not yet, at least.' },
+        { id: 'story-10million', condition: () => mana >= 10000000, text: 'The landscape around your domain has changed. Trees grow taller, flowers bloom in impossible colors, and animals speak in hushed tones. Your Mana has seeped into the world itself.' },
+        { id: 'story-guild', condition: () => buildings.find(b => b.id === 'mages-guild')?.owned >= 1, text: 'The Mages\' Guild you founded is now the foremost center of arcane learning in the realm. Scholars travel from distant lands to study here. The irony is not lost on you \u2014 you were self-taught.' },
+        { id: 'story-100million', condition: () => mana >= 100000000, text: 'Kings and queens seek your counsel. Wars are avoided with a word from you. The power you wield is no longer just magical \u2014 it is political. You must be careful.' },
+        { id: 'story-billion', condition: () => mana >= 1000000000, text: 'A billion Mana. You can feel the Weave itself bending toward you, as if drawn by gravity. You stand at the threshold of something ancient and vast. The prestige of Ascension calls to you.' },
+        { id: 'story-first-prestige', condition: () => (typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() >= 1), text: 'You have ascended and been reborn. The memories of your past life linger like a dream \u2014 the tower, the guild, the worshippers. All gone. But the crystals remain, and with them, the knowledge of what you can become. This time, you will go further.' },
+        { id: 'story-spire', condition: () => buildings.find(b => b.id === 'magic-spire')?.owned >= 1, text: 'The Magic Spire pierces the veil between realms. Through its peak, you glimpse other worlds \u2014 worlds made entirely of Mana, worlds where magic is as natural as breathing. One day, you will walk among them.' },
+        { id: 'story-trillion', condition: () => mana >= 1000000000000, text: 'A trillion Mana. You are no longer a wizard. The word is too small. You are a force of nature, a living conduit between the mundane and the infinite. What comes next, no one alive can tell you. You must discover it yourself.' }
+    ];
+    const triggeredMilestones = new Set();
+
+    function checkStoryMilestones() {
+        if (!eventsLog) return;
+        storyMilestones.forEach(milestone => {
+            if (triggeredMilestones.has(milestone.id)) return;
+            try {
+                if (milestone.condition()) {
+                    triggeredMilestones.add(milestone.id);
+                    showStoryMilestone(milestone.text);
+                }
+            } catch (e) { /* ignore */ }
+        });
+    }
+
+    function showStoryMilestone(text) {
+        const eventElement = document.createElement('div');
+        eventElement.className = 'flavor-event story-milestone';
+        eventElement.setAttribute('role', 'status');
+        eventElement.setAttribute('aria-live', 'polite');
+        eventElement.textContent = text;
+
+        eventsLog.prepend(eventElement);
+
+        // Remove oldest if over max
+        while (eventsLog.children.length > MAX_MESSAGES) {
+            eventsLog.removeChild(eventsLog.lastChild);
+        }
+
+        // Play a sound
+        if (typeof SoundModule !== 'undefined') {
+            SoundModule.play('achievement');
+        }
+    }
+
+    function loadTriggeredMilestones(ids) {
+        if (Array.isArray(ids)) {
+            ids.forEach(id => triggeredMilestones.add(id));
+        }
+    }
+
+    function getTriggeredMilestones() {
+        return Array.from(triggeredMilestones);
+    }
+
     function formatInteractiveNumber(num) {
         if (typeof OptionsModule !== 'undefined' && OptionsModule.formatNumber) {
             return OptionsModule.formatNumber(Math.floor(num));
@@ -162,6 +226,8 @@ const FlavorEventsModule = (function() {
     function init() {
         eventsLog = document.getElementById('events-log');
         scheduleNextEvent();
+        // Check milestones every 2 seconds
+        setInterval(checkStoryMilestones, 2000);
     }
 
     function getRandomInterval() {
@@ -346,6 +412,8 @@ const FlavorEventsModule = (function() {
     return {
         init,
         addFlavorText,
-        getFlavorTexts
+        getFlavorTexts,
+        loadTriggeredMilestones,
+        getTriggeredMilestones
     };
 })();

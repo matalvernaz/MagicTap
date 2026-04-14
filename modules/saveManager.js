@@ -40,7 +40,8 @@ const SaveManager = (function() {
             rankingUpgrades: RankingUpgradesModule.getSaveData(),
             spellcasting: typeof SpellcastingModule !== 'undefined' ? SpellcastingModule.getSaveData() : null,
             sound: typeof SoundModule !== 'undefined' ? SoundModule.getSaveData() : null,
-            challenges: typeof ChallengesModule !== 'undefined' ? ChallengesModule.getSaveData() : null
+            challenges: typeof ChallengesModule !== 'undefined' ? ChallengesModule.getSaveData() : null,
+            storyMilestones: typeof FlavorEventsModule !== 'undefined' && FlavorEventsModule.getTriggeredMilestones ? FlavorEventsModule.getTriggeredMilestones() : null
         };
     }
 
@@ -129,6 +130,11 @@ const SaveManager = (function() {
             // Restore Challenges
             if (data.challenges && typeof ChallengesModule !== 'undefined') {
                 ChallengesModule.loadSaveData(data.challenges);
+            }
+
+            // Restore story milestones
+            if (data.storyMilestones && typeof FlavorEventsModule !== 'undefined' && FlavorEventsModule.loadTriggeredMilestones) {
+                FlavorEventsModule.loadTriggeredMilestones(data.storyMilestones);
             }
 
             return true;

@@ -600,7 +600,7 @@ const upgrades = [
         id: 'abjuration',
         name: 'Abjuration',
         description: 'Increases Mana per second by 1%.',
-        flavorText: '',
+        flavorText: 'The art of protection. A shield against the chaos of raw magic.',
         cost: 15000,
         effect: () => { mpsUpgradeMultiplier *= 1.01; recalculateMPS(); },
         isPurchased: false,
@@ -612,7 +612,7 @@ const upgrades = [
         id: 'conjuration',
         name: 'Conjuration',
         description: 'Increases Mana per second by 1%.',
-        flavorText: '',
+        flavorText: 'To pull something from nothing. Or rather, from somewhere else entirely.',
         cost: 19999,
         effect: () => { mpsUpgradeMultiplier *= 1.01; recalculateMPS(); },
         isPurchased: false,
@@ -624,7 +624,7 @@ const upgrades = [
         id: 'divination',
         name: 'Divination',
         description: 'Increases Mana per second by 1%.',
-        flavorText: '',
+        flavorText: 'Knowing where the Mana will flow before it arrives. The future is a useful place to look.',
         cost: 49999,
         effect: () => { mpsUpgradeMultiplier *= 1.01; recalculateMPS(); },
         isPurchased: false,
@@ -636,7 +636,7 @@ const upgrades = [
         id: 'evocation',
         name: 'Evocation',
         description: 'Increases Mana per second by 2%.',
-        flavorText: '',
+        flavorText: 'Fire, lightning, frost. The flashiest school, and the most dangerous. Handle with care.',
         cost: 499999,
         effect: () => { mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
         isPurchased: false,
@@ -648,7 +648,7 @@ const upgrades = [
         id: 'enchantment',
         name: 'Enchantment',
         description: 'Increases Mana per second by 1%.',
-        flavorText: '',
+        flavorText: 'Weaving magic into the mundane. A chair that never breaks, a quill that never dulls.',
         cost: 49999,
         effect: () => { mpsUpgradeMultiplier *= 1.01; recalculateMPS(); },
         isPurchased: false,
@@ -660,7 +660,7 @@ const upgrades = [
         id: 'illusion',
         name: 'Illusion',
         description: 'Increases Mana per second by 2%.',
-        flavorText: '',
+        flavorText: 'Nothing is real, and everything is permitted. At least, that is what you tell people.',
         cost: 49999,
         effect: () => { mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
         isPurchased: false,
@@ -672,7 +672,7 @@ const upgrades = [
         id: 'necromancy',
         name: 'Necromancy',
         description: 'Increases Mana per second by 2%.',
-        flavorText: '',
+        flavorText: 'The dead have no use for their Mana. You, on the other hand, have plenty of use for it.',
         cost: 99999,
         effect: () => { mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
         isPurchased: false,
@@ -684,7 +684,7 @@ const upgrades = [
         id: 'summoning',
         name: 'Summoning',
         description: 'Increases Mana per second by 2%.',
-        flavorText: '',
+        flavorText: 'Call forth beings from distant planes. They bring gifts of Mana, if you ask nicely.',
         cost: 199999,
         effect: () => { mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
         isPurchased: false,
@@ -696,7 +696,7 @@ const upgrades = [
         id: 'transmutation',
         name: 'Transmutation',
         description: 'Increases Mana per second by 2%.',
-        flavorText: '',
+        flavorText: 'Change lead to gold, stone to water, doubt to power. The world is yours to reshape.',
         cost: 49999,
         effect: () => { mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
         isPurchased: false,
@@ -933,7 +933,7 @@ const upgrades = [
         id: 'wizards-cape',
         name: 'Wizard\'s Cape',
         description: 'Increases Mana per second by 1%.',
-        flavorText: '',
+        flavorText: 'It billows dramatically even when there is no wind. Essential wizard attire.',
         cost: 9500,
         effect: () => { mpsUpgradeMultiplier *= 1.01; recalculateMPS(); },
         isPurchased: false,
@@ -945,7 +945,7 @@ const upgrades = [
         id: 'wizards-staff',
         name: 'Wizard\'s Staff',
         description: 'Increases Mana per click by 10.',
-        flavorText: '',
+        flavorText: 'A good staff is an extension of the wizard. This one hums with latent energy.',
         cost: 9500,
         effect: () => { manaPerClick += 10; },
         isPurchased: false,
@@ -957,7 +957,7 @@ const upgrades = [
         id: 'witchs-broom',
         name: 'Witch\'s Broom',
         description: 'Increases Mana per second by 2%.',
-        flavorText: '',
+        flavorText: 'Borrowed from a colleague. She said you could keep it if you stop calling it a broom.',
         cost: 11500,
         effect: () => { mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
         isPurchased: false,
@@ -969,7 +969,7 @@ const upgrades = [
         id: 'ancient-spell-staff',
         name: 'Ancient Spell Staff',
         description: 'Triples Mana per click.',
-        flavorText: '',
+        flavorText: 'Recovered from a prestige long past. The wood is warm to the touch, as if remembering its former master.',
         cost: 19000,
         effect: () => { manaPerClick *= 3; },
         isPurchased: false,
@@ -981,7 +981,7 @@ const upgrades = [
         id: 'wizards-hat',
         name: 'Wizard\'s Hat',
         description: 'Increases Mana per second by 3%.',
-        flavorText: '',
+        flavorText: 'Tall, pointed, and slightly singed at the tip. You have earned this.',
         cost: 29999,
         effect: () => { mpsUpgradeMultiplier *= 1.03; recalculateMPS(); },
         isPurchased: false,
@@ -993,7 +993,7 @@ const upgrades = [
         id: 'wizards-mantle',
         name: 'Wizard\'s Mantle',
         description: 'Increases Mana per second by 3%.',
-        flavorText: '',
+        flavorText: 'Woven from threads of concentrated starlight. Heavy on the shoulders, light on the soul.',
         cost: 49000,
         effect: () => { mpsUpgradeMultiplier *= 1.03; recalculateMPS(); },
         isPurchased: false,
@@ -1005,7 +1005,7 @@ const upgrades = [
         id: 'enchanted-amulet',
         name: 'Enchanted Amulet',
         description: 'Increases Mana per second by 3%.',
-        flavorText: '',
+        flavorText: 'A gemstone that pulses in time with your heartbeat. It knows you.',
         cost: 90000,
         effect: () => { mpsUpgradeMultiplier *= 1.03; recalculateMPS(); },
         isPurchased: false,
@@ -1017,7 +1017,7 @@ const upgrades = [
         id: 'warding-ring',
         name: 'Warding Ring',
         description: 'Increases MPS based on your Magic Proficiency.',
-        flavorText: '',
+        flavorText: 'A simple band of silver that grows warmer as your power increases. It recognizes mastery.',
         cost: 190000,
         effect: () => { proficiencyUpgradeCount++; recalculateMPS(); },
         isPurchased: false,
@@ -1029,7 +1029,7 @@ const upgrades = [
         id: 'magic-wand',
         name: 'Magic Wand',
         description: 'Doubles Mana per click and increases MPS based on your Magic Proficiency.',
-        flavorText: '',
+        flavorText: 'The wand chooses the wizard. This one practically leapt into your hand.',
         cost: 900000,
         effect: () => { manaPerClick *= 2; proficiencyUpgradeCount++; recalculateMPS(); },
         isPurchased: false,
@@ -1041,7 +1041,7 @@ const upgrades = [
         id: 'ancient-scroll',
         name: 'Ancient Scroll',
         description: 'Increases MPS based on your Magic Proficiency.',
-        flavorText: '',
+        flavorText: 'The ink shimmers and rearranges as you read. It teaches differently each time.',
         cost: 1500000,
         effect: () => { proficiencyUpgradeCount++; recalculateMPS(); },
         isPurchased: false,
@@ -1053,7 +1053,7 @@ const upgrades = [
         id: 'magic-monocle',
         name: 'Magic Monocle',
         description: 'Increases MPS based on your Magic Proficiency.',
-        flavorText: '',
+        flavorText: 'Through this lens, you see the world as it truly is: threads of Mana, everywhere.',
         cost: 9000000,
         effect: () => { proficiencyUpgradeCount++; recalculateMPS(); },
         isPurchased: false,
@@ -1065,7 +1065,7 @@ const upgrades = [
         id: 'crystal-ball',
         name: 'Crystal Ball',
         description: 'Increases MPS based on your Magic Proficiency.',
-        flavorText: '',
+        flavorText: 'Peer into its depths and see not the future, but the potential of what you could become.',
         cost: 90000000,
         effect: () => { proficiencyUpgradeCount++; recalculateMPS(); },
         isPurchased: false,
@@ -1712,7 +1712,28 @@ function gatherMana() {
 
     mana += effectiveMPC;
     StatisticsModule.addManaByClick(effectiveMPC);
+    showFloatingNumber(effectiveMPC);
+    if (typeof TutorialModule !== 'undefined') TutorialModule.checkTriggers('firstClick');
     updateDisplay();
+}
+
+// Function to show floating click number
+function showFloatingNumber(amount) {
+    const button = document.getElementById('gather-mana-button');
+    if (!button) return;
+
+    const floater = document.createElement('span');
+    floater.className = 'floating-click-number';
+    floater.setAttribute('aria-hidden', 'true');
+    floater.textContent = '+' + OptionsModule.formatNumber(Math.floor(amount));
+
+    const offsetX = (Math.random() - 0.5) * 60;
+    floater.style.left = `calc(50% + ${offsetX}px)`;
+
+    button.parentElement.style.position = 'relative';
+    button.parentElement.appendChild(floater);
+
+    floater.addEventListener('animationend', () => floater.remove());
 }
 
 // --- Bulk Buy Logic ---
@@ -1795,6 +1816,9 @@ function buyBuilding(buildingId) {
 
         // Announce purchase for screen readers
         announceToScreenReader(`Purchased ${amount} ${building.name}`);
+
+        // Tutorial trigger
+        if (typeof TutorialModule !== 'undefined') TutorialModule.checkTriggers('firstBuilding');
     }
 }
 
@@ -1961,6 +1985,9 @@ function buyUpgrade(upgradeId) {
 
         // Announce purchase for screen readers
         announceToScreenReader('Purchased');
+
+        // Tutorial trigger
+        if (typeof TutorialModule !== 'undefined') TutorialModule.checkTriggers('firstUpgrade');
     } else {
         // Do nothing if cannot afford
     }
@@ -2570,6 +2597,7 @@ FlavorEventsModule.init();
 RunestonesModule.init();
 SoundModule.init();
 SaveManager.init();
+TutorialModule.init();
 
 // Set up gather button sound handling (click and hold)
 setupGatherButtonSounds();
