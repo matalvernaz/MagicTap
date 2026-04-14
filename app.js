@@ -1727,7 +1727,8 @@ function buyBuilding(buildingId) {
         for (let i = 0; i < amount; i++) {
             StatisticsModule.addBuildingOwned();
         }
-        updateBuildingDisplay(building);
+        // Update all buildings (synergies create cross-building dependencies)
+        buildings.forEach(b => { if (b.element) updateBuildingDisplay(b); });
         updateDisplay();
 
         // Play building purchase sound
