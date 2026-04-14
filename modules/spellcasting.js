@@ -185,15 +185,20 @@ const SpellcastingModule = (function() {
             if (typeof RunestonesModule !== 'undefined') {
                 RunestonesModule.spawnRunestone();
             }
+            if (typeof showGameNotification === 'function') {
+                showGameNotification('Rune Cast: A Runestone has been summoned!', 'success');
+            }
             updateDisplay();
             return true;
         }
 
         // Check if this spell type is already active
         const existingIndex = activeSpells.findIndex(a => a.spellId === spellId);
+        let isRefresh = false;
         if (existingIndex >= 0) {
-            // Refresh duration
+            // Refresh duration (does not stack)
             activeSpells[existingIndex].remainingTime = spell.duration;
+            isRefresh = true;
         } else {
             // Add new active spell
             activeSpells.push({
@@ -207,8 +212,17 @@ const SpellcastingModule = (function() {
             recalculateMPS();
         }
 
+        // Announce to screen reader and show notification
+        const castMessage = isRefresh
+            ? `${spell.name} refreshed for ${spell.duration} seconds.`
+            : `${spell.name} cast for ${spell.duration} seconds. ${spell.description}`;
+        if (typeof showGameNotification === 'function') {
+            showGameNotification(castMessage, 'success');
+        }
+
         updateDisplay();
         renderActiveSpells();
+        updateMainScreenSpells();
         return true;
     }
 
@@ -241,6 +255,9 @@ const SpellcastingModule = (function() {
             }
             renderActiveSpells();
         }
+
+        // Always update the main screen spell timers
+        updateMainScreenSpells();
     }
 
     // Update the spell power display
@@ -284,6 +301,25 @@ const SpellcastingModule = (function() {
                 </div>
             `;
         }).join('');
+    }
+
+    // Update the main screen spell indicators (always visible, outside the panel)
+    function updateMainScreenSpells() {
+        const container = document.getElementById('active-spells-main');
+        if (!container) return;
+
+        if (activeSpells.length === 0) {
+            container.style.display = 'none';
+            container.innerHTML = '';
+            return;
+        }
+
+        container.style.display = '';
+        container.innerHTML = activeSpells.map(active => {
+            const spell = spells.find(s => s.id === active.spellId);
+            if (!spell) return '';
+            return `<span class="main-spell-tag" aria-label="${spell.name}, ${Math.ceil(active.remainingTime)} seconds remaining">${spell.name} ${Math.ceil(active.remainingTime)}s</span>`;
+        }).join(' ');
     }
 
     // Render the spells list
