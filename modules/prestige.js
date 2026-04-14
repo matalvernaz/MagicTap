@@ -144,6 +144,17 @@ const PrestigeModule = (function() {
             isWellBoost: true,
             isPurchased: false,
             unlockCost: 0
+        },
+        {
+            id: 'arcane-automation',
+            name: 'Arcane Automation',
+            description: 'Automatically buys the cheapest affordable upgrade and building every 3 seconds.',
+            flavorText: 'Why manage when magic can optimize for you?',
+            cost: 30,
+            isAutoBuy: true,
+            isPurchased: false,
+            unlockCost: 0,
+            requiresUpgrade: 'arcane-auto-gather'
         }
     ];
 
@@ -821,6 +832,11 @@ const PrestigeModule = (function() {
         return upgrade && upgrade.isPurchased;
     }
 
+    function hasAutoBuy() {
+        const upgrade = prestigeUpgrades.find(u => u.id === 'arcane-automation');
+        return upgrade && upgrade.isPurchased;
+    }
+
     function getPrestigeUpgrades() {
         return prestigeUpgrades;
     }
@@ -852,6 +868,7 @@ const PrestigeModule = (function() {
         hasRunestoneBoost,
         hasSpellRegenBoost,
         hasWellBoost,
+        hasAutoBuy,
         addPrestigePotential,
         getPrestigePotential,
         getHighestPotentialTier,

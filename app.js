@@ -75,6 +75,27 @@ function getSynergyMultiplier(buildingId) {
     return 1 + (sourceBuilding.owned * synergy.rate);
 }
 
+// Calculate the effective production per single unit of a building (with all multipliers)
+function getEffectiveBuildingProduction(building) {
+    let prod = building.productionPerSecond;
+    // Synergy
+    prod *= getSynergyMultiplier(building.id);
+    // Challenge building reward
+    if (typeof ChallengesModule !== 'undefined') {
+        prod *= ChallengesModule.getBuildingProductionMultiplier(building.id);
+    }
+    // Global multipliers (upgrades, proficiency, prestige)
+    prod *= mpsUpgradeMultiplier;
+    if (typeof PrestigeModule !== 'undefined') {
+        prod *= PrestigeModule.getPrestigeMultiplier();
+    }
+    // Challenge production restriction
+    if (typeof ChallengesModule !== 'undefined') {
+        prod *= ChallengesModule.getProductionMultiplier();
+    }
+    return prod;
+}
+
 // --- Game Data Structures ---
 const buildings = [
     {
@@ -1547,7 +1568,10 @@ function updateDisplay() {
         mpsDisplay.textContent = `${OptionsModule.formatNumber(effectiveMPS)} MPS`;
     }
     mpcDisplay.textContent = `${OptionsModule.formatNumber(Math.floor(manaPerClick))} per click`;
+    // Update browser tab title with current mana
+    document.title = `${OptionsModule.formatNumber(Math.floor(mana))} Mana - MagicTap`;
     checkAffordability(); // Check affordability for both buildings and upgrades
+    updateBuyAllButton();
 }
 
 // Function to gather mana when the button is clicked
@@ -1682,9 +1706,12 @@ function createBuildingElement(building) {
         synergyHTML = `<p class="building-synergy" aria-label="Synergy: ${synergy.label}, currently plus ${bonusPct} percent">Synergy: ${synergy.label} (currently +${bonusPct}%)</p>`;
     }
 
+    const effectiveProd = getEffectiveBuildingProduction(building);
+
     buildingDiv.innerHTML = `
         <p id="building-name-${building.id}" class="building-name">${building.name}</p>
         <p class="building-description">${building.description}</p>
+        <p class="building-production-effective" aria-label="Each produces ${OptionsModule.formatNumber(effectiveProd)} Mana per second">Each: ${OptionsModule.formatNumber(effectiveProd)} MPS</p>
         ${synergyHTML}
         <p class="building-flavor">${building.flavorText}</p>
         <p class="building-owned">Owned: <span>${building.owned}</span></p>
@@ -1705,6 +1732,14 @@ function updateBuildingDisplay(building) {
     const amount = getEffectiveBulkAmount(building);
     const cost = amount > 0 ? getEffectiveBulkCost(building) : getBuildingCurrentCost(building);
     building.element.querySelector('.building-cost .cost-value').textContent = OptionsModule.formatNumber(Math.floor(cost));
+
+    // Update effective production display
+    const prodEl = building.element.querySelector('.building-production-effective');
+    if (prodEl) {
+        const effectiveProd = getEffectiveBuildingProduction(building);
+        prodEl.textContent = `Each: ${OptionsModule.formatNumber(effectiveProd)} MPS`;
+        prodEl.setAttribute('aria-label', `Each produces ${OptionsModule.formatNumber(effectiveProd)} Mana per second`);
+    }
 
     // Update synergy display with current bonus
     const synergyEl = building.element.querySelector('.building-synergy');
@@ -2123,6 +2158,38 @@ function getEffectiveMPS() {
     return effectiveMPS;
 }
 
+// Auto-buy: purchases the cheapest affordable upgrade and building
+function autoBuyCheapest() {
+    // Buy cheapest affordable upgrade
+    const affordableUpgrades = upgrades.filter(u => u.isUnlocked && !u.isPurchased && mana >= getUpgradeCurrentCost(u));
+    if (affordableUpgrades.length > 0) {
+        // Block if challenge restricts upgrades
+        if (!(typeof ChallengesModule !== 'undefined' && ChallengesModule.isUpgradeRestricted())) {
+            affordableUpgrades.sort((a, b) => getUpgradeCurrentCost(a) - getUpgradeCurrentCost(b));
+            buyUpgrade(affordableUpgrades[0].id);
+        }
+    }
+
+    // Buy cheapest affordable building (1 unit)
+    const affordableBuildings = buildings.filter(b => {
+        if (!b.isUnlocked) return false;
+        if (typeof ChallengesModule !== 'undefined' && ChallengesModule.isBuildingRestricted(b.id)) return false;
+        return mana >= getBuildingCurrentCost(b);
+    });
+    if (affordableBuildings.length > 0) {
+        affordableBuildings.sort((a, b) => getBuildingCurrentCost(a) - getBuildingCurrentCost(b));
+        // Temporarily set bulk to 1 for auto-buy
+        const savedBulk = bulkBuyAmount;
+        bulkBuyAmount = 1;
+        buyBuilding(affordableBuildings[0].id);
+        bulkBuyAmount = savedBulk;
+    }
+}
+
+// Tick counters for prestige auto-features
+let autoClickerTick = 0;
+let autoBuyTick = 0;
+
 function gameLoop() {
     // Skip production if in prestige mode
     if (PrestigeModule.isPrestigeMode()) {
@@ -2137,6 +2204,30 @@ function gameLoop() {
         StatisticsModule.addManaByBuildings(manaFromBuildings);
     }
     StatisticsModule.setCurrentMana(mana);
+
+    // Auto-clicker from prestige upgrade (1 click per second = every 10 ticks)
+    if (PrestigeModule.hasAutoClicker && PrestigeModule.hasAutoClicker()) {
+        autoClickerTick++;
+        if (autoClickerTick >= 10) {
+            autoClickerTick = 0;
+            let autoMPC = manaPerClick;
+            if (typeof RunestonesModule !== 'undefined') autoMPC += RunestonesModule.getTempMPCBonus();
+            if (typeof SpellcastingModule !== 'undefined') autoMPC *= SpellcastingModule.getMPCMultiplier();
+            if (typeof ChallengesModule !== 'undefined') autoMPC *= ChallengesModule.getMPCMultiplier();
+            if (autoMPC < 1) autoMPC = 1;
+            mana += autoMPC;
+            StatisticsModule.addManaByClick(autoMPC);
+        }
+    }
+
+    // Auto-buy from prestige upgrade (every 3 seconds = every 30 ticks)
+    if (PrestigeModule.hasAutoBuy && PrestigeModule.hasAutoBuy()) {
+        autoBuyTick++;
+        if (autoBuyTick >= 30) {
+            autoBuyTick = 0;
+            autoBuyCheapest();
+        }
+    }
 
     // Check achievements and unlocks
     AchievementsModule.checkAchievements(StatisticsModule.getStats());
@@ -2309,11 +2400,61 @@ function createBulkBuyControls() {
     buildingsHeading.insertAdjacentElement('afterend', controls);
 }
 
+// --- Buy All Affordable Upgrades ---
+function createBuyAllUpgradesButton() {
+    const upgradesHeading = document.getElementById('upgrades-heading');
+    if (!upgradesHeading) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'buy-all-upgrades-button';
+    btn.className = 'buy-all-upgrades-btn';
+    btn.textContent = 'Buy All Affordable';
+    btn.setAttribute('aria-label', 'Purchase all upgrades you can currently afford');
+    btn.style.display = 'none'; // Hidden until there are affordable upgrades
+
+    btn.addEventListener('click', () => {
+        if (typeof ChallengesModule !== 'undefined' && ChallengesModule.isUpgradeRestricted()) return;
+
+        let bought = 0;
+        // Sort by cost ascending, buy cheapest first
+        const affordable = upgrades
+            .filter(u => u.isUnlocked && !u.isPurchased && mana >= getUpgradeCurrentCost(u))
+            .sort((a, b) => getUpgradeCurrentCost(a) - getUpgradeCurrentCost(b));
+
+        affordable.forEach(upgrade => {
+            if (mana >= getUpgradeCurrentCost(upgrade)) {
+                buyUpgrade(upgrade.id);
+                bought++;
+            }
+        });
+
+        if (bought > 0) {
+            announceToScreenReader(`Purchased ${bought} upgrade${bought > 1 ? 's' : ''}`);
+        }
+    });
+
+    upgradesHeading.insertAdjacentElement('afterend', btn);
+}
+
+function updateBuyAllButton() {
+    const btn = document.getElementById('buy-all-upgrades-button');
+    if (!btn) return;
+
+    const affordable = upgrades.filter(u => u.isUnlocked && !u.isPurchased && mana >= getUpgradeCurrentCost(u));
+    if (affordable.length >= 2) {
+        btn.style.display = '';
+        btn.textContent = `Buy All Affordable (${affordable.length})`;
+    } else {
+        btn.style.display = 'none';
+    }
+}
+
 // Initial setup
 initializePanels();
 SpellcastingModule.init(); // Must init before setupNavigation so the panel DOM exists
 setupNavigation();
 createBulkBuyControls();
+createBuyAllUpgradesButton();
 updateDisplay();
 renderBuildings();
 renderUpgrades();
@@ -2324,6 +2465,46 @@ SaveManager.init();
 
 // Set up gather button sound handling (click and hold)
 setupGatherButtonSounds();
+
+// --- Keyboard Shortcuts ---
+document.addEventListener('keydown', (e) => {
+    // Don't trigger shortcuts when typing in an input/textarea
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    // Don't trigger if a modifier key is held (allow browser shortcuts)
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    const key = e.key.toLowerCase();
+    const panelKeys = {
+        's': 'statistics-button',
+        'a': 'achievements-button',
+        'u': 'upgrades-button',
+        'r': 'ranking-upgrades-button',
+        'd': 'production-button',
+        'p': 'prestige-button',
+        'c': 'challenges-button',
+        'w': 'wishing-well-button',
+        'l': 'spellcasting-button',
+        'o': 'options-button'
+    };
+
+    if (key === 'g') {
+        // G = Gather Mana
+        gatherMana();
+    } else if (panelKeys[key]) {
+        const btn = document.getElementById(panelKeys[key]);
+        if (btn && btn.style.display !== 'none') {
+            btn.click();
+        }
+    }
+});
+
+// --- Unsaved Progress Warning ---
+window.addEventListener('beforeunload', (e) => {
+    // Save before leaving
+    if (typeof SaveManager !== 'undefined') {
+        SaveManager.save();
+    }
+});
 
 // Display version in title
 document.getElementById('game-title').textContent = 'MagicTap, V.' + VERSION;

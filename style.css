@@ -206,6 +206,37 @@ footer {
     margin-bottom: 5px;
 }
 
+/* Buy All Affordable Upgrades Button */
+.buy-all-upgrades-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    background-color: #9b59b6;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.buy-all-upgrades-btn:hover {
+    background-color: #8e44ad;
+}
+
+.buy-all-upgrades-btn:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.building-item .building-production-effective {
+    font-size: 0.9em;
+    color: #4CAF50;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
 .building-item .building-synergy {
     font-size: 0.85em;
     color: #ffd700;
