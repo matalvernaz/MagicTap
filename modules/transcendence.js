@@ -99,6 +99,16 @@ const TranscendenceModule = (function() {
             isPurchased: false,
             requiresUpgrade: 'arcane-omniscience',
             effect: { type: 'mpsMultiplier', value: 2.0 }
+        },
+        {
+            id: 'eternal-slumber',
+            name: 'Eternal Slumber',
+            description: 'Offline Mana cap increased from 8 hours to 24 hours.',
+            flavorText: 'Your magic works tirelessly through the night. Even sleep cannot slow your ascent.',
+            cost: 3,
+            isPurchased: false,
+            requiresUpgrade: 'beyond-mortality',
+            effect: { type: 'offlineCap', value: 24 }
         }
     ];
 
@@ -174,6 +184,11 @@ const TranscendenceModule = (function() {
 
     function getOfflineRate() {
         const upgrade = transcendenceUpgrades.find(u => u.id === 'beyond-mortality');
+        return (upgrade && upgrade.isPurchased) ? upgrade.effect.value : null;
+    }
+
+    function getOfflineCapHours() {
+        const upgrade = transcendenceUpgrades.find(u => u.id === 'eternal-slumber');
         return (upgrade && upgrade.isPurchased) ? upgrade.effect.value : null;
     }
 
@@ -382,6 +397,7 @@ const TranscendenceModule = (function() {
         getStartingBuildings,
         getCrystalBonusMultiplier,
         getOfflineRate,
+        getOfflineCapHours,
         getPrestigeMultiplier,
         getSaveData,
         loadSaveData,

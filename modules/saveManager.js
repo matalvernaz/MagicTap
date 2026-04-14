@@ -168,7 +168,14 @@ const SaveManager = (function() {
         const now = Date.now();
         const elapsed = (now - saveData.timestamp) / 1000; // seconds
         const MIN_OFFLINE_SECONDS = 60; // At least 1 minute away
-        const MAX_OFFLINE_SECONDS = 8 * 60 * 60; // Cap at 8 hours
+
+        // Base cap: 8 hours, upgradeable to 24 via Transcendence
+        let maxOfflineHours = 8;
+        if (typeof TranscendenceModule !== 'undefined' && TranscendenceModule.getOfflineCapHours) {
+            const upgraded = TranscendenceModule.getOfflineCapHours();
+            if (upgraded) maxOfflineHours = upgraded;
+        }
+        const MAX_OFFLINE_SECONDS = maxOfflineHours * 60 * 60;
 
         if (elapsed < MIN_OFFLINE_SECONDS) return null;
 
@@ -185,14 +192,19 @@ const SaveManager = (function() {
             prestigeMultiplier = 1 + (rawBonus * (potential / 100));
         }
 
-        // Offline earns 50% of active rate (standard idle game convention)
-        const offlineRate = 0.5;
+        // Offline rate: 50% base, 75% with Beyond Mortality transcendence upgrade
+        let offlineRate = 0.5;
+        if (typeof TranscendenceModule !== 'undefined' && TranscendenceModule.getOfflineRate) {
+            const upgraded = TranscendenceModule.getOfflineRate();
+            if (upgraded) offlineRate = upgraded;
+        }
         const earned = savedMPS * prestigeMultiplier * cappedElapsed * offlineRate;
 
         return {
             earned: earned,
             elapsed: cappedElapsed,
-            wasCapped: elapsed > MAX_OFFLINE_SECONDS
+            wasCapped: elapsed > MAX_OFFLINE_SECONDS,
+            maxHours: maxOfflineHours
         };
     }
 
@@ -241,7 +253,7 @@ const SaveManager = (function() {
             note.className = 'notification-content';
             note.style.fontSize = '0.9em';
             note.style.marginTop = '5px';
-            note.textContent = '(Offline earnings capped at 8 hours)';
+            note.textContent = `(Offline earnings capped at ${progress.maxHours} hours)`;
             notification.appendChild(note);
         }
 
