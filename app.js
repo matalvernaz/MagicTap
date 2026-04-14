@@ -1489,7 +1489,229 @@ const upgrades = [
         isUnlocked: false,
         element: null
     },
-    // === INSERT NEW UPGRADES HERE ===
+    // === MANA MANIPULATOR UPGRADES ===
+    {
+        id: 'forbidden-techniques',
+        name: 'Forbidden Techniques',
+        description: 'Mana Manipulators are twice as effective.',
+        flavorText: 'The forbidden texts reveal why these were hidden. Not from danger, but from jealousy.',
+        cost: 400000,
+        effect: () => { const b = buildings.find(b => b.id === 'mana-manipulator'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'mana-manipulator')?.owned >= 10,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'mana-resonance',
+        name: 'Mana Resonance',
+        description: 'Mana Manipulators are twice as effective.',
+        flavorText: 'When manipulators work in concert, their output resonates and amplifies.',
+        cost: 5000000,
+        effect: () => { const b = buildings.find(b => b.id === 'mana-manipulator'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'mana-manipulator')?.owned >= 25,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'reality-bender',
+        name: 'Reality Bender',
+        description: 'Mana Manipulators are three times as effective.',
+        flavorText: 'At this scale, the manipulators do not just channel Mana. They bend reality itself.',
+        cost: 500000000,
+        effect: () => { const b = buildings.find(b => b.id === 'mana-manipulator'); if(b) b.productionPerSecond *= 3; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'mana-manipulator')?.owned >= 50,
+        isUnlocked: false,
+        element: null
+    },
+    // === MANA FOUNTAIN UPGRADES ===
+    {
+        id: 'deep-wells',
+        name: 'Deep Wells',
+        description: 'Mana Fountains are twice as effective.',
+        flavorText: 'Drill deeper. The richest Mana veins are far below the surface.',
+        cost: 500000000,
+        effect: () => { const b = buildings.find(b => b.id === 'mana-fountain'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'mana-fountain')?.owned >= 10,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'geyser-network',
+        name: 'Geyser Network',
+        description: 'Mana Fountains are twice as effective.',
+        flavorText: 'Connect the fountains underground. What erupts is greater than the sum of its parts.',
+        cost: 2000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'mana-fountain'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'mana-fountain')?.owned >= 25,
+        isUnlocked: false,
+        element: null
+    },
+    // === CHURCH OF MANA UPGRADES ===
+    {
+        id: 'devoted-congregation',
+        name: 'Devoted Congregation',
+        description: 'Churches of Mana are twice as effective.',
+        flavorText: 'The faithful gather in greater numbers. Their combined devotion shakes the foundations.',
+        cost: 700000000,
+        effect: () => { const b = buildings.find(b => b.id === 'church-of-mana'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'church-of-mana')?.owned >= 1,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'holy-relics',
+        name: 'Holy Relics',
+        description: 'Churches of Mana are twice as effective.',
+        flavorText: 'Ancient artifacts of devotion, each one a conduit for the Weave\'s blessings.',
+        cost: 5000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'church-of-mana'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'church-of-mana')?.owned >= 10,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'cathedral-of-the-weave',
+        name: 'Cathedral of the Weave',
+        description: 'Churches of Mana are three times as effective.',
+        flavorText: 'No longer mere churches. These are cathedrals where the Weave itself comes to worship.',
+        cost: 50000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'church-of-mana'); if(b) b.productionPerSecond *= 3; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'church-of-mana')?.owned >= 25,
+        isUnlocked: false,
+        element: null
+    },
+    // === MAGES' GUILD UPGRADES ===
+    {
+        id: 'research-grants',
+        name: 'Research Grants',
+        description: 'Mages\' Guilds are twice as effective.',
+        flavorText: 'Fund their research and they will fund your ambition.',
+        cost: 5000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'mages-guild'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'mages-guild')?.owned >= 1,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'guild-alliance',
+        name: 'Guild Alliance',
+        description: 'Mages\' Guilds are twice as effective.',
+        flavorText: 'The guilds form a grand alliance. Knowledge flows freely between them.',
+        cost: 50000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'mages-guild'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'mages-guild')?.owned >= 10,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'arcane-university',
+        name: 'Arcane University',
+        description: 'Mages\' Guilds are three times as effective.',
+        flavorText: 'The guilds ascend into a true university. Degrees in applied thaumaturgy are now offered.',
+        cost: 500000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'mages-guild'); if(b) b.productionPerSecond *= 3; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'mages-guild')?.owned >= 25,
+        isUnlocked: false,
+        element: null
+    },
+    // === MAGIC LIBRARY UPGRADES ===
+    {
+        id: 'forbidden-section',
+        name: 'Forbidden Section',
+        description: 'Magic Libraries are twice as effective.',
+        flavorText: 'Behind the velvet rope, the real knowledge awaits. Enter at your own risk.',
+        cost: 15000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'magic-library'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'magic-library')?.owned >= 1,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'living-tomes',
+        name: 'Living Tomes',
+        description: 'Magic Libraries are twice as effective.',
+        flavorText: 'The books have learned to read themselves. They share what they discover.',
+        cost: 150000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'magic-library'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'magic-library')?.owned >= 10,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'infinite-archive',
+        name: 'Infinite Archive',
+        description: 'Magic Libraries are three times as effective.',
+        flavorText: 'A library that extends into other dimensions. Every book that was, is, or will be written exists here.',
+        cost: 1500000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'magic-library'); if(b) b.productionPerSecond *= 3; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'magic-library')?.owned >= 25,
+        isUnlocked: false,
+        element: null
+    },
+    // === MAGIC SPIRE UPGRADES ===
+    {
+        id: 'planar-beacon',
+        name: 'Planar Beacon',
+        description: 'Magic Spires are twice as effective.',
+        flavorText: 'The spire now broadcasts its presence across the planes, drawing Mana like a lighthouse draws ships.',
+        cost: 200000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'magic-spire'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'magic-spire')?.owned >= 1,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'rift-conduit',
+        name: 'Rift Conduit',
+        description: 'Magic Spires are twice as effective.',
+        flavorText: 'Permanent rifts stabilize around each spire, pouring raw magic into the world.',
+        cost: 2000000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'magic-spire'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'magic-spire')?.owned >= 10,
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'tower-of-eternity',
+        name: 'Tower of Eternity',
+        description: 'Magic Spires are three times as effective.',
+        flavorText: 'The spire no longer ends. It extends infinitely upward, piercing every plane simultaneously.',
+        cost: 20000000000000,
+        effect: () => { const b = buildings.find(b => b.id === 'magic-spire'); if(b) b.productionPerSecond *= 3; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'magic-spire')?.owned >= 25,
+        isUnlocked: false,
+        element: null
+    },
+    // === MANA SHARD ADDITIONAL UPGRADES ===
+    {
+        id: 'shard-symphony',
+        name: 'Shard Symphony',
+        description: 'Mana Shards are twice as effective.',
+        flavorText: 'When enough shards vibrate together, they produce a symphony of pure magical resonance.',
+        cost: 50000000,
+        effect: () => { const b = buildings.find(b => b.id === 'mana-shard'); if(b) b.productionPerSecond *= 2; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => buildings.find(b => b.id === 'mana-shard')?.owned >= 50,
+        isUnlocked: false,
+        element: null
+    },
 ];
 
 // --- Helper Functions ---
