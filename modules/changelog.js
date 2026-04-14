@@ -2,6 +2,22 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '1.0',
+            date: '04-13-26',
+            summary: `Transcendence - second prestige layer with Arcane Essence currency and 10 endgame upgrades.
+Narrative Tutorial - guided story intro for new players.
+16 Story Milestones narrating the wizard's rise to power.
+All empty upgrade flavor text filled in with thematic descriptions.
+Keyboard Shortcuts documented in Options panel.
+Wizard Proficiency and rank shown on the main screen.
+Effective production per building shown on each card with all multipliers.
+Buy All Affordable upgrades button.
+Arcane Automation prestige upgrade for true idle play.
+Mana shown in tab title when backgrounded.
+Save on tab close. Fixed runestone/wishing well notifications.
+Fixed wishing well softlock. Fixed synergy cross-update bug.`
+        },
+        {
             version: '0.9',
             date: '04-13-26',
             summary: `Building Synergies - buildings boost each other based on ownership, creating strategic depth.

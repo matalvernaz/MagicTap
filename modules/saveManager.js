@@ -41,7 +41,8 @@ const SaveManager = (function() {
             spellcasting: typeof SpellcastingModule !== 'undefined' ? SpellcastingModule.getSaveData() : null,
             sound: typeof SoundModule !== 'undefined' ? SoundModule.getSaveData() : null,
             challenges: typeof ChallengesModule !== 'undefined' ? ChallengesModule.getSaveData() : null,
-            storyMilestones: typeof FlavorEventsModule !== 'undefined' && FlavorEventsModule.getTriggeredMilestones ? FlavorEventsModule.getTriggeredMilestones() : null
+            storyMilestones: typeof FlavorEventsModule !== 'undefined' && FlavorEventsModule.getTriggeredMilestones ? FlavorEventsModule.getTriggeredMilestones() : null,
+            transcendence: typeof TranscendenceModule !== 'undefined' ? TranscendenceModule.getSaveData() : null
         };
     }
 
@@ -130,6 +131,11 @@ const SaveManager = (function() {
             // Restore Challenges
             if (data.challenges && typeof ChallengesModule !== 'undefined') {
                 ChallengesModule.loadSaveData(data.challenges);
+            }
+
+            // Restore Transcendence
+            if (data.transcendence && typeof TranscendenceModule !== 'undefined') {
+                TranscendenceModule.loadSaveData(data.transcendence);
             }
 
             // Restore story milestones

@@ -545,6 +545,12 @@ h2:focus {
     }
 }
 
+#proficiency-display {
+    font-size: 0.9em;
+    color: #9b8ed4;
+    margin-top: 2px;
+}
+
 /* Tablet Responsive Styles */
 @media screen and (min-width: 601px) and (max-width: 900px) {
     #buildings-container,
@@ -1127,6 +1133,142 @@ h2:focus {
     padding: 15px;
     margin-bottom: 15px;
     font-style: italic;
+}
+
+/* Transcendence Panel */
+.transcendence-description {
+    color: #aaa;
+    font-style: italic;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.transcendence-status {
+    background: linear-gradient(135deg, #1a1a2a, #2a1a2a);
+    border: 1px solid #9b59b6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.transcendence-status p {
+    margin: 5px 0;
+}
+
+#transcendence-essence {
+    color: #d4a0ff;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+#transcendence-count {
+    color: #9b59b6;
+}
+
+#transcendence-pending {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.transcend-button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2em;
+    background: linear-gradient(135deg, #9b59b6, #6a1b9a);
+    color: #fff;
+    border: 2px solid #d4a0ff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 20px;
+    transition: background 0.2s;
+}
+
+.transcend-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #8e44ad, #7b1fa2);
+}
+
+.transcend-button:disabled {
+    background: #3a3a4a;
+    border-color: #555;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.transcend-button:focus {
+    outline: 2px solid #ffd700;
+    outline-offset: 2px;
+}
+
+.transcendence-upgrade-item {
+    background-color: #2a2a3a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border-left: 4px solid #d4a0ff;
+}
+
+.transcendence-upgrade-item.purchased {
+    border-left-color: #7cfc00;
+    opacity: 0.85;
+}
+
+.transcendence-upgrade-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #d4a0ff;
+    margin-bottom: 5px;
+}
+
+.transcendence-upgrade-item.purchased .transcendence-upgrade-name {
+    color: #7cfc00;
+}
+
+.transcendence-upgrade-desc {
+    color: #ccc;
+    margin: 5px 0;
+}
+
+.transcendence-upgrade-flavor {
+    color: #888;
+    font-style: italic;
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+
+.transcendence-upgrade-cost {
+    color: #d4a0ff;
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.transcendence-buy-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.transcendence-buy-btn.can-afford {
+    background-color: #9b59b6;
+    color: #fff;
+}
+
+.transcendence-buy-btn.can-afford:hover {
+    background-color: #8e44ad;
+}
+
+.transcendence-buy-btn.cannot-afford {
+    background-color: #3a3a4a;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.transcendence-buy-btn:focus {
+    outline: 2px solid #ffd700;
+    outline-offset: 2px;
 }
 
 /* Tutorial */

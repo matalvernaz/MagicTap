@@ -455,6 +455,36 @@
     text-align: right;
 }
 
+/* Keyboard Shortcuts */
+.shortcuts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 6px;
+}
+
+.shortcuts-list li {
+    padding: 4px 0;
+    color: #ccc;
+    font-size: 0.95em;
+}
+
+.shortcuts-list kbd {
+    display: inline-block;
+    background-color: #4a4a4a;
+    border: 1px solid #666;
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #ffd700;
+    margin-right: 8px;
+    min-width: 20px;
+    text-align: center;
+}
+
 .danger-zone {
     border: 1px solid #dc3545;
 }

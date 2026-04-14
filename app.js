@@ -1,4 +1,4 @@
-const VERSION = '0.9';
+const VERSION = '1.0';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -75,6 +75,7 @@ function initializePanels() {
         ProductionModule.getHTML() +
         PrestigeModule.getHTML() +
         ChallengesModule.getHTML() +
+        TranscendenceModule.getHTML() +
         WishingWellModule.getHTML() +
         ChangelogModule.getHTML() +
         OptionsModule.getHTML();
@@ -83,6 +84,7 @@ function initializePanels() {
     OptionsModule.init();
     PrestigeModule.init();
     ChallengesModule.init();
+    TranscendenceModule.init();
     RankingUpgradesModule.init();
     ChangelogModule.renderChangelog();
     AchievementsModule.renderAchievements();
@@ -189,6 +191,11 @@ function getEffectiveBuildingProduction(building) {
     // Spellcasting MPS multiplier
     if (typeof SpellcastingModule !== 'undefined') {
         prod *= SpellcastingModule.getMPSMultiplier();
+    }
+
+    // Transcendence MPS multiplier (permanent)
+    if (typeof TranscendenceModule !== 'undefined') {
+        prod *= TranscendenceModule.getMPSMultiplier();
     }
 
     return prod;
@@ -1502,6 +1509,10 @@ function getBuildingCurrentCost(building) {
     if (typeof ChallengesModule !== 'undefined') {
         cost *= ChallengesModule.getBuildingCostMultiplier();
     }
+    // Apply transcendence cost reduction
+    if (typeof TranscendenceModule !== 'undefined') {
+        cost *= TranscendenceModule.getBuildingCostMultiplier();
+    }
     return cost;
 }
 
@@ -1611,7 +1622,13 @@ function recalculateMPS() {
         challengeRewardMPSMult = ChallengesModule.getMPSMultiplier();
     }
 
-    manaPerSecond = baseMPS * mpsUpgradeMultiplier * proficiencyMultiplier * wishingWellMultiplier * runestoneMPSMultiplier * challengeProductionMult * challengeRewardMPSMult;
+    // Apply transcendence MPS multiplier (permanent)
+    let transcendenceMPSMult = 1;
+    if (typeof TranscendenceModule !== 'undefined') {
+        transcendenceMPSMult = TranscendenceModule.getMPSMultiplier();
+    }
+
+    manaPerSecond = baseMPS * mpsUpgradeMultiplier * proficiencyMultiplier * wishingWellMultiplier * runestoneMPSMultiplier * challengeProductionMult * challengeRewardMPSMult * transcendenceMPSMult;
 
     // Add Runestone temporary MPS bonus (flat bonus from Jazz Hands, Gushing Ley Lines, etc.)
     if (typeof RunestonesModule !== 'undefined') {
@@ -1666,6 +1683,22 @@ function updateDisplay() {
         mpsDisplay.textContent = `${OptionsModule.formatNumber(effectiveMPS)} MPS`;
     }
     mpcDisplay.textContent = `${OptionsModule.formatNumber(Math.floor(manaPerClick))} per click`;
+
+    // Update proficiency display
+    if (typeof WizardRankModule !== 'undefined') {
+        const profDisplay = document.getElementById('proficiency-display');
+        if (profDisplay) {
+            const proficiency = WizardRankModule.getMagicProficiency();
+            if (proficiency > 0) {
+                profDisplay.style.display = '';
+                const rank = WizardRankModule.getCurrentRank ? WizardRankModule.getCurrentRank() : null;
+                const rankText = rank && rank.name ? ` (${rank.name})` : '';
+                profDisplay.textContent = `Proficiency: ${proficiency.toFixed(0)}%${rankText}`;
+                profDisplay.setAttribute('aria-label', `Wizard Proficiency: ${proficiency.toFixed(0)} percent${rankText}`);
+            }
+        }
+    }
+
     // Update browser tab title with current mana (only when tab is hidden to avoid screen reader noise)
     if (document.hidden) {
         if (!updateDisplay._titleTick) updateDisplay._titleTick = 0;
@@ -1706,6 +1739,10 @@ function gatherMana() {
     // Apply challenge reward MPC multiplier
     if (typeof ChallengesModule !== 'undefined') {
         effectiveMPC *= ChallengesModule.getMPCMultiplier();
+    }
+    // Apply transcendence MPC multiplier
+    if (typeof TranscendenceModule !== 'undefined') {
+        effectiveMPC *= TranscendenceModule.getMPCMultiplier();
     }
     // Ensure MPC doesn't go below 1
     if (effectiveMPC < 1) effectiveMPC = 1;
@@ -1948,6 +1985,12 @@ function updateSectionVisibility() {
     if (prestigeBtn && PrestigeModule.shouldShowPrestige()) {
         prestigeBtn.style.display = '';
     }
+
+    // Show purchased upgrades button once you have at least one
+    const upgradesBtn = document.getElementById('upgrades-button');
+    if (upgradesBtn && upgrades.some(u => u.isPurchased)) {
+        upgradesBtn.style.display = '';
+    }
 }
 
 // --- Upgrade Logic ---
@@ -2156,6 +2199,7 @@ function setupNavigation() {
         'production-button': document.getElementById('production-panel'),
         'prestige-button': document.getElementById('prestige-panel'),
         'challenges-button': document.getElementById('challenges-panel'),
+        'transcendence-button-nav': document.getElementById('transcendence-panel'),
         'wishing-well-button': document.getElementById('wishing-well-panel'),
         'spellcasting-button': document.getElementById('spellcasting-panel'),
         'changelog-button': document.getElementById('changelog-panel'),
@@ -2384,6 +2428,15 @@ function gameLoop() {
         }
     }
 
+    // Update Transcendence (visibility + display)
+    if (typeof TranscendenceModule !== 'undefined') {
+        const transBtn = document.getElementById('transcendence-button-nav');
+        if (transBtn && TranscendenceModule.shouldShow()) {
+            transBtn.style.display = '';
+        }
+        TranscendenceModule.updateDisplay();
+    }
+
     // Update prestige display (for countdown timers)
     PrestigeModule.updateDisplay();
 
@@ -2432,6 +2485,28 @@ function resetForPrestige() {
 
     // Apply prestige building boosts and recalculate
     PrestigeModule.applyAllPrestigeBuildingBoosts();
+
+    // Apply starting mana from prestige and transcendence upgrades
+    let startingMana = PrestigeModule.getStartingMana();
+    if (typeof TranscendenceModule !== 'undefined') startingMana += TranscendenceModule.getStartingMana();
+    if (startingMana > 0) mana = startingMana;
+
+    // Apply starting buildings from prestige and transcendence upgrades
+    const startingBuildings = PrestigeModule.getStartingBuildings();
+    if (typeof TranscendenceModule !== 'undefined') {
+        const transBuildings = TranscendenceModule.getStartingBuildings();
+        Object.entries(transBuildings).forEach(([id, count]) => {
+            startingBuildings[id] = (startingBuildings[id] || 0) + count;
+        });
+    }
+    Object.entries(startingBuildings).forEach(([id, count]) => {
+        const building = buildings.find(b => b.id === id);
+        if (building) {
+            building.owned += count;
+            building.isUnlocked = true;
+        }
+    });
+
     recalculateMPS();
 
     // Reset upgrades (all upgrades reset each run)

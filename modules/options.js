@@ -58,6 +58,22 @@ const OptionsModule = (function() {
                 <div class="option-group">
                     <button id="save-options-button">Save Changes</button>
                 </div>
+                <div class="option-group">
+                    <h3>Keyboard Shortcuts</h3>
+                    <ul class="shortcuts-list" aria-label="Keyboard shortcuts">
+                        <li><kbd>G</kbd> Gather Mana</li>
+                        <li><kbd>S</kbd> Statistics</li>
+                        <li><kbd>A</kbd> Achievements</li>
+                        <li><kbd>U</kbd> Purchased Upgrades</li>
+                        <li><kbd>R</kbd> Ranking Upgrades</li>
+                        <li><kbd>D</kbd> Production</li>
+                        <li><kbd>P</kbd> Prestige</li>
+                        <li><kbd>C</kbd> Challenges</li>
+                        <li><kbd>W</kbd> Wishing Well</li>
+                        <li><kbd>L</kbd> Spellcasting</li>
+                        <li><kbd>O</kbd> Options</li>
+                    </ul>
+                </div>
                 <div class="option-group danger-zone">
                     <h3>Danger Zone</h3>
                     <button id="reset-game-button" class="danger-button">Reset Game</button>

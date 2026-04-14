@@ -62,3 +62,20 @@ Interactive events now play a sound and announce to screen readers when they app
 Synergy display is fully accessible with live-updating aria-labels showing current bonus percentage.
 Fixed Spellcasting panel not opening (init order bug since V.0.7).
 Fixed bulk buy buttons not visually highlighting the active selection.
+V.1.0, 04-13-2026:
+Transcendence - a second prestige layer for endgame players. Sacrifice Mana Crystals and prestige upgrades to earn Arcane Essence, a permanent currency with 10 powerful upgrades including Eternal Flow (+25% MPS), Essence of Clicking (x2 MPC), Timeless Knowledge (+50% crystal gain), and The Source (x2 MPS).
+Narrative Tutorial - guided 5-step intro for new players that tells the story of becoming a wizard and teaches core mechanics.
+Story Milestones - 16 narrative events that trigger at key progression points (100 Mana through 1 trillion), narrating the wizard's rise to power.
+Flavor Text - filled in all 22 empty upgrade descriptions with thematic text (spell schools, apparel, proficiency items).
+Keyboard Shortcuts - documented in the Options panel. G=gather, letter keys for all panels.
+Proficiency Indicator - Wizard Proficiency and rank now displayed on the main screen under MPS.
+Effective Production Display - each building card shows real production per unit with all multipliers applied, updates live.
+Buy All Affordable - button above upgrades that purchases all affordable upgrades at once.
+Arcane Automation - new prestige upgrade that auto-buys cheapest building and upgrade every 3 seconds.
+Progressive Disclosure - Purchased Upgrades button hidden until you have one.
+Mana in tab title (only when tab is in background, to avoid screen reader noise).
+Save on tab close to prevent progress loss.
+Fixed runestone and wishing well notifications (were silently broken since original release).
+Fixed wishing well softlock: coins now generate from zero instead of requiring coins to earn coins.
+Fixed synergy display not updating when buying other buildings.
+Fixed per-building production display to include all multipliers accurately.
