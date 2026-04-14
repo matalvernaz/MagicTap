@@ -560,6 +560,17 @@ h2:focus {
     font-weight: bold;
 }
 
+/* Game Notifications (runestones, wishing well) */
+.game-notification {
+    background-color: #2d3a4a;
+    border-color: #4CAF50;
+}
+
+.game-notification.notification-warning {
+    background-color: #4a3a2a;
+    border-color: #ff8c00;
+}
+
 /* Ranking Upgrades Panel */
 #ranking-upgrades-panel .ranking-info {
     margin-bottom: 1.5em;

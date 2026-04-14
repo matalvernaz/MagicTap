@@ -403,9 +403,9 @@ const RunestonesModule = (function() {
         const resultMessage = effect.apply();
 
         // Show notification
-        if (typeof NotificationModule !== 'undefined') {
+        if (typeof showGameNotification === 'function') {
             const type = activeRunestone.isPositive ? 'success' : 'warning';
-            NotificationModule.show(`${effect.name}: ${resultMessage}`, type);
+            showGameNotification(`${effect.name}: ${resultMessage}`, type);
         }
 
         // Start effect timer only for non-instant effects
@@ -463,8 +463,8 @@ const RunestonesModule = (function() {
 
         updateEffectDisplay();
 
-        if (typeof NotificationModule !== 'undefined') {
-            NotificationModule.show('Runestone effect has ended.', wasNegative ? 'success' : 'info');
+        if (typeof showGameNotification === 'function') {
+            showGameNotification('Runestone effect has ended.', wasNegative ? 'success' : 'info');
         }
     }
 

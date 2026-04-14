@@ -24,6 +24,47 @@ let mpsUpgradeMultiplier = 1; // Multiplier from upgrades that boost all MPS
 let proficiencyUpgradeCount = 0; // Count of kitten-style upgrades that scale with Magic Proficiency
 let bulkBuyAmount = 1;
 
+// --- Game Notification System ---
+// Global notification function used by modules (replaces missing NotificationModule)
+function showGameNotification(message, type) {
+    const notificationArea = document.getElementById('notification-area');
+    if (!notificationArea) return;
+
+    // Screen reader announcement
+    const srAlert = document.createElement('span');
+    srAlert.className = 'sr-only';
+    srAlert.setAttribute('role', 'alert');
+    srAlert.textContent = message;
+    notificationArea.appendChild(srAlert);
+    setTimeout(() => srAlert.remove(), 3000);
+
+    // Visible notification
+    const notification = document.createElement('div');
+    notification.className = 'notification game-notification';
+    if (type === 'warning') notification.classList.add('notification-warning');
+
+    const dismissBtn = document.createElement('button');
+    dismissBtn.className = 'notification-dismiss';
+    dismissBtn.setAttribute('aria-label', 'Dismiss notification');
+    dismissBtn.textContent = 'X';
+    dismissBtn.addEventListener('click', () => {
+        notification.remove();
+    });
+
+    const content = document.createElement('p');
+    content.className = 'notification-content';
+    content.textContent = message;
+
+    notification.appendChild(dismissBtn);
+    notification.appendChild(content);
+    notificationArea.appendChild(notification);
+
+    // Auto-dismiss after 8 seconds
+    setTimeout(() => {
+        if (notification.parentNode) notification.remove();
+    }, 8000);
+}
+
 // --- Initialize Panels ---
 function initializePanels() {
     // Insert panel HTML into the panels container
@@ -1568,8 +1609,17 @@ function updateDisplay() {
         mpsDisplay.textContent = `${OptionsModule.formatNumber(effectiveMPS)} MPS`;
     }
     mpcDisplay.textContent = `${OptionsModule.formatNumber(Math.floor(manaPerClick))} per click`;
-    // Update browser tab title with current mana
-    document.title = `${OptionsModule.formatNumber(Math.floor(mana))} Mana - MagicTap`;
+    // Update browser tab title with current mana (only when tab is hidden to avoid screen reader noise)
+    if (document.hidden) {
+        if (!updateDisplay._titleTick) updateDisplay._titleTick = 0;
+        updateDisplay._titleTick++;
+        if (updateDisplay._titleTick >= 50) {
+            updateDisplay._titleTick = 0;
+            document.title = `${OptionsModule.formatNumber(Math.floor(mana))} Mana - MagicTap`;
+        }
+    } else if (document.title !== 'MagicTap, V.' + VERSION) {
+        document.title = 'MagicTap, V.' + VERSION;
+    }
     checkAffordability(); // Check affordability for both buildings and upgrades
     updateBuyAllButton();
 }

@@ -255,15 +255,15 @@ const WishingWellModule = (function() {
         if (!effect || effect.isBackfire) return;
 
         if (coins < effect.cost) {
-            if (typeof NotificationModule !== 'undefined') {
-                NotificationModule.show('Not enough coins!', 'warning');
+            if (typeof showGameNotification === 'function') {
+                showGameNotification('Not enough coins!', 'warning');
             }
             return;
         }
 
         if (activeEffect !== null) {
-            if (typeof NotificationModule !== 'undefined') {
-                NotificationModule.show('An effect is already active!', 'warning');
+            if (typeof showGameNotification === 'function') {
+                showGameNotification('An effect is already active!', 'warning');
             }
             return;
         }
@@ -275,12 +275,12 @@ const WishingWellModule = (function() {
         let finalEffect = effect;
         if (effect.backfireId && Math.random() < BACKFIRE_CHANCE) {
             finalEffect = effects.find(e => e.id === effect.backfireId);
-            if (typeof NotificationModule !== 'undefined') {
-                NotificationModule.show('The well backfires! ' + finalEffect.name + ' activated.', 'warning');
+            if (typeof showGameNotification === 'function') {
+                showGameNotification('The well backfires! ' + finalEffect.name + ' activated.', 'warning');
             }
         } else {
-            if (typeof NotificationModule !== 'undefined') {
-                NotificationModule.show(finalEffect.name + ' activated!', 'success');
+            if (typeof showGameNotification === 'function') {
+                showGameNotification(finalEffect.name + ' activated!', 'success');
             }
         }
 
@@ -346,8 +346,8 @@ const WishingWellModule = (function() {
         updateActiveEffectDisplay();
         renderEffects(); // Update button states
 
-        if (typeof NotificationModule !== 'undefined') {
-            NotificationModule.show('Wishing Well effect has ended.', wasNegative ? 'success' : 'info');
+        if (typeof showGameNotification === 'function') {
+            showGameNotification('Wishing Well effect has ended.', wasNegative ? 'success' : 'info');
         }
     }
 
