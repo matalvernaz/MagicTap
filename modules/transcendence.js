@@ -191,7 +191,7 @@ const TranscendenceModule = (function() {
         <section id="transcendence-panel" class="game-panel" hidden>
             <h2 id="transcendence-heading" tabindex="-1">Transcendence</h2>
             <div id="transcendence-container" aria-labelledby="transcendence-heading">
-                <p class="transcendence-description">Beyond prestige lies Transcendence. Sacrifice your Mana Crystals and prestige upgrades to earn Arcane Essence \u2014 a currency of pure, distilled power that persists forever.</p>
+                <p class="transcendence-description">Beyond prestige lies Transcendence. Sacrifice your prestige-earned Mana Crystals (the currency, not the building) and prestige upgrades to earn Arcane Essence \u2014 a currency of pure, distilled power that persists forever.</p>
                 <div class="transcendence-status">
                     <p>Arcane Essence: <span id="transcendence-essence">${arcaneEssence}</span></p>
                     <p>Times Transcended: <span id="transcendence-count">${timesTranscended}</span></p>
