@@ -380,8 +380,20 @@ const WishingWellModule = (function() {
         if (levelEl) levelEl.textContent = level;
         if (triggerCountEl) triggerCountEl.textContent = effectTriggerCount;
 
-        // Update effect button states based on coin count
-        renderEffects();
+        // Update effect button states without full re-render (prevents click stealing)
+        const effectButtons = document.querySelectorAll('#wishing-well-effects-list .effect-button');
+        effectButtons.forEach(btn => {
+            // Find the effect by matching the button's text content
+            const costSpan = btn.querySelector('.effect-cost');
+            if (costSpan) {
+                const costText = costSpan.textContent;
+                const costMatch = costText.match(/(\d+)/);
+                if (costMatch) {
+                    const cost = parseInt(costMatch[1]);
+                    btn.disabled = coins < cost || activeEffect !== null;
+                }
+            }
+        });
     }
 
     function getMPSMultiplier() {
