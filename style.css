@@ -206,6 +206,12 @@ footer {
     margin-bottom: 5px;
 }
 
+.building-item .building-synergy {
+    font-size: 0.85em;
+    color: #ffd700;
+    margin-bottom: 5px;
+}
+
 .building-item .building-flavor {
     font-size: 0.85em;
     color: #888;
@@ -376,50 +382,6 @@ h2:focus {
     border-radius: 4px;
 }
 
-/* Interactive Events */
-.interactive-event {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    border-left-color: #ffd700;
-    background-color: #3a3a2a;
-    animation: slideIn 0.3s ease-out;
-}
-
-.interactive-event-text {
-    flex: 1;
-}
-
-.interactive-event-button {
-    flex-shrink: 0;
-    padding: 6px 16px;
-    font-size: 0.9em;
-    background-color: #ffd700;
-    color: #1a1a1a;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    min-height: 36px;
-    transition: background-color 0.2s;
-}
-
-.interactive-event-button:hover {
-    background-color: #ffed4a;
-}
-
-.interactive-event-button:focus {
-    outline: 2px solid #007bff;
-    outline-offset: 2px;
-}
-
-.interactive-event-result {
-    border-left-color: #7cfc00;
-    background-color: #2a3a2a;
-    color: #7cfc00;
-}
-
 /* Game Panels (toggled via navigation) */
 .game-panel {
     margin-top: 20px;
@@ -523,30 +485,6 @@ h2:focus {
     }
 }
 
-/* Floating Click Numbers */
-.floating-click-number {
-    position: absolute;
-    top: 0;
-    pointer-events: none;
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #7cfc00;
-    text-shadow: 0 0 6px rgba(124, 252, 0, 0.5);
-    animation: float-up 0.8s ease-out forwards;
-    z-index: 10;
-}
-
-@keyframes float-up {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-60px);
-    }
-}
-
 /* Bulk Buy Controls */
 .bulk-buy-controls {
     display: flex;
@@ -584,21 +522,11 @@ h2:focus {
     outline-offset: 2px;
 }
 
-.bulk-buy-btn[aria-pressed="true"] {
+.bulk-buy-btn[aria-checked="true"] {
     background-color: #007bff;
     border-color: #007bff;
     color: #fff;
     font-weight: bold;
-}
-
-/* Offline Progress Notification */
-.offline-progress-notification {
-    background-color: #2d4a2d;
-    border-color: #7cfc00;
-}
-
-.offline-progress-notification .notification-title {
-    color: #7cfc00;
 }
 
 /* Ranking Upgrades Panel */
@@ -915,6 +843,145 @@ h2:focus {
     display: flex;
     justify-content: center;
     gap: 15px;
+}
+
+/* Challenges Panel */
+.challenges-info {
+    color: #aaa;
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+.active-challenge-banner {
+    background: linear-gradient(135deg, #2a2a1a, #3a3a2a);
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.active-challenge-banner p {
+    margin: 5px 0;
+}
+
+#active-challenge-name {
+    color: #ffd700;
+    font-size: 1.1em;
+}
+
+#active-challenge-progress {
+    color: #7cfc00;
+}
+
+#active-challenge-timer {
+    color: #ff8c00;
+    font-weight: bold;
+}
+
+#abandon-challenge-button {
+    margin-top: 10px;
+    background-color: #6a4a4a;
+    font-size: 0.9em;
+}
+
+#abandon-challenge-button:hover {
+    background-color: #7a5a5a;
+}
+
+.challenge-item {
+    background-color: #3a3a3a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border-left: 4px solid #ffd700;
+}
+
+.challenge-item.completed {
+    border-left-color: #7cfc00;
+    opacity: 0.85;
+}
+
+.challenge-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.challenge-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffd700;
+    margin: 0;
+}
+
+.challenge-item.completed .challenge-name {
+    color: #7cfc00;
+}
+
+.challenge-reward-badge {
+    background-color: #4a3a5a;
+    color: #9b59b6;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    margin: 0;
+}
+
+.challenge-description {
+    color: #ccc;
+    margin: 5px 0;
+}
+
+.challenge-restriction {
+    color: #ff8c00;
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+
+.challenge-reward {
+    color: #7cfc00;
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+
+.challenge-active-label {
+    color: #ffd700;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.start-challenge-button {
+    margin-top: 10px;
+    background-color: #ffd700;
+    color: #1a1a1a;
+    font-weight: bold;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 36px;
+}
+
+.start-challenge-button:hover {
+    background-color: #ffed4a;
+}
+
+.start-challenge-button:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.challenge-complete-notification {
+    background-color: #2d4a2d;
+    border-color: #7cfc00;
+}
+
+.challenge-complete-notification .notification-title {
+    color: #ffd700;
 }
 
 .modal-buttons button {

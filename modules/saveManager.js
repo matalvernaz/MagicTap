@@ -39,7 +39,8 @@ const SaveManager = (function() {
             wishingWell: WishingWellModule.getState(),
             rankingUpgrades: RankingUpgradesModule.getSaveData(),
             spellcasting: typeof SpellcastingModule !== 'undefined' ? SpellcastingModule.getSaveData() : null,
-            sound: typeof SoundModule !== 'undefined' ? SoundModule.getSaveData() : null
+            sound: typeof SoundModule !== 'undefined' ? SoundModule.getSaveData() : null,
+            challenges: typeof ChallengesModule !== 'undefined' ? ChallengesModule.getSaveData() : null
         };
     }
 
@@ -123,6 +124,11 @@ const SaveManager = (function() {
             // Restore Sound settings
             if (data.sound && typeof SoundModule !== 'undefined') {
                 SoundModule.loadSaveData(data.sound);
+            }
+
+            // Restore Challenges
+            if (data.challenges && typeof ChallengesModule !== 'undefined') {
+                ChallengesModule.loadSaveData(data.challenges);
             }
 
             return true;
