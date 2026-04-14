@@ -326,13 +326,8 @@ const FlavorEventsModule = (function() {
             SoundModule.play('menuOpen');
         }
 
-        // Screen reader announcement
-        const srAlert = document.createElement('span');
-        srAlert.className = 'sr-only';
-        srAlert.setAttribute('role', 'alert');
-        srAlert.textContent = 'An interactive event has appeared in the events log.';
-        eventsLog.appendChild(srAlert);
-        setTimeout(() => srAlert.remove(), 2000);
+        // events-log has aria-live="polite", so new content is
+        // automatically announced — no separate alert needed
 
         const event = available[Math.floor(Math.random() * available.length)];
 

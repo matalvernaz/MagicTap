@@ -212,14 +212,9 @@ const SaveManager = (function() {
         const notificationArea = document.getElementById('notification-area');
         if (!notificationArea) return;
 
-        // Screen reader announcement
-        const liveAnnouncement = document.createElement('span');
-        liveAnnouncement.className = 'sr-only';
-        liveAnnouncement.setAttribute('role', 'alert');
         const formattedMana = typeof OptionsModule !== 'undefined' ? OptionsModule.formatNumber(Math.floor(progress.earned)) : Math.floor(progress.earned).toString();
-        liveAnnouncement.textContent = `Welcome back! You earned ${formattedMana} Mana while away.`;
-        notificationArea.appendChild(liveAnnouncement);
-        setTimeout(() => liveAnnouncement.remove(), 3000);
+        // notification-area has aria-live="assertive", so the visible
+        // notification below is automatically announced — no separate alert needed
 
         // Format elapsed time
         const hours = Math.floor(progress.elapsed / 3600);

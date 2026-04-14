@@ -30,15 +30,9 @@ function showGameNotification(message, type) {
     const notificationArea = document.getElementById('notification-area');
     if (!notificationArea) return;
 
-    // Screen reader announcement
-    const srAlert = document.createElement('span');
-    srAlert.className = 'sr-only';
-    srAlert.setAttribute('role', 'alert');
-    srAlert.textContent = message;
-    notificationArea.appendChild(srAlert);
-    setTimeout(() => srAlert.remove(), 3000);
-
-    // Visible notification
+    // Visible notification (notification-area has aria-live="assertive"
+    // so adding content here is automatically announced — no separate
+    // role="alert" span needed, which would cause double-announcement)
     const notification = document.createElement('div');
     notification.className = 'notification game-notification';
     if (type === 'warning') notification.classList.add('notification-warning');

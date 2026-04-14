@@ -167,7 +167,7 @@ const ChallengesModule = (function() {
         if (notificationArea) {
             const announcement = document.createElement('span');
             announcement.className = 'sr-only';
-            announcement.setAttribute('role', 'alert');
+            // notification-area has aria-live, no role="alert" needed
             announcement.textContent = `Challenge started: ${challenge.name}. ${challenge.restriction}`;
             notificationArea.appendChild(announcement);
             setTimeout(() => announcement.remove(), 3000);
@@ -203,7 +203,7 @@ const ChallengesModule = (function() {
         if (notificationArea) {
             const announcement = document.createElement('span');
             announcement.className = 'sr-only';
-            announcement.setAttribute('role', 'alert');
+            // notification-area has aria-live, no role="alert" needed
             announcement.textContent = `Challenge abandoned: ${name}.`;
             notificationArea.appendChild(announcement);
             setTimeout(() => announcement.remove(), 3000);
@@ -231,7 +231,7 @@ const ChallengesModule = (function() {
         if (notificationArea) {
             const announcement = document.createElement('span');
             announcement.className = 'sr-only';
-            announcement.setAttribute('role', 'alert');
+            // notification-area has aria-live, no role="alert" needed
             announcement.textContent = `Challenge completed: ${name}! Reward: ${reward}`;
             notificationArea.appendChild(announcement);
             setTimeout(() => announcement.remove(), 3000);

@@ -1014,15 +1014,9 @@ const AchievementsModule = (function() {
         const notificationArea = document.getElementById('notification-area');
         if (!notificationArea) return;
 
-        // Live announcement
-        const liveAnnouncement = document.createElement('span');
-        liveAnnouncement.className = 'sr-only';
-        liveAnnouncement.setAttribute('role', 'alert');
-        liveAnnouncement.textContent = `New Achievement: ${achievementName}. ${achievementDescription}`;
-        notificationArea.appendChild(liveAnnouncement);
-        setTimeout(() => liveAnnouncement.remove(), 3000);
-
-        // Visible notification - fully accessible when user navigates to it
+        // Visible notification (notification-area has aria-live="assertive"
+        // so content changes are automatically announced — no separate
+        // role="alert" needed, which would cause double-announcement)
         const notification = document.createElement('div');
         notification.className = 'notification';
 
