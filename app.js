@@ -117,23 +117,80 @@ function getSynergyMultiplier(buildingId) {
 }
 
 // Calculate the effective production per single unit of a building (with all multipliers)
+// Calculate the effective production per single unit of a building (mirrors recalculateMPS logic)
 function getEffectiveBuildingProduction(building) {
     let prod = building.productionPerSecond;
+
     // Synergy
     prod *= getSynergyMultiplier(building.id);
-    // Challenge building reward
+
+    // Challenge building reward (permanent)
     if (typeof ChallengesModule !== 'undefined') {
         prod *= ChallengesModule.getBuildingProductionMultiplier(building.id);
     }
-    // Global multipliers (upgrades, proficiency, prestige)
-    prod *= mpsUpgradeMultiplier;
-    if (typeof PrestigeModule !== 'undefined') {
-        prod *= PrestigeModule.getPrestigeMultiplier();
+
+    // Runestone building production multiplier (Arcane Overflow)
+    if (typeof RunestonesModule !== 'undefined') {
+        prod *= RunestonesModule.getTempBuildingProductionMultiplier();
+        // Specific building multiplier (True Sight, Crystal Clear)
+        prod *= RunestonesModule.getSpecificBuildingMultiplier(building.id);
     }
-    // Challenge production restriction
+
+    // Delegation By Hand (Wizard's Hands get +1% per non-Hand building)
+    if (building.id === 'wizards-hand' && upgrades.find(u => u.id === 'delegation-by-hand')?.isPurchased) {
+        let totalNonHand = 0;
+        buildings.forEach(b => { if (b.id !== 'wizards-hand') totalNonHand += b.owned; });
+        prod *= 1 + (totalNonHand * 0.01);
+    }
+
+    // Overseer (Wizard's Eyes get +1% per non-Eye building)
+    if (building.id === 'wizards-eye' && upgrades.find(u => u.id === 'overseer')?.isPurchased) {
+        let totalNonEye = 0;
+        buildings.forEach(b => { if (b.id !== 'wizards-eye') totalNonEye += b.owned; });
+        prod *= 1 + (totalNonEye * 0.01);
+    }
+
+    // Global multipliers: upgrade multiplier, proficiency, prestige
+    prod *= mpsUpgradeMultiplier;
+
+    // Proficiency multiplier (kitten-style)
+    if (proficiencyUpgradeCount > 0 && typeof WizardRankModule !== 'undefined') {
+        const proficiency = WizardRankModule.getMagicProficiency() / 100;
+        for (let i = 0; i < proficiencyUpgradeCount; i++) {
+            prod *= (1 + proficiency * 0.05);
+        }
+    }
+
+    // Wishing Well multiplier (temporary)
+    if (typeof WishingWellModule !== 'undefined') {
+        prod *= WishingWellModule.getMPSMultiplier();
+    }
+
+    // Runestone MPS multiplier (Mana Surge, Mana Void)
+    if (typeof RunestonesModule !== 'undefined') {
+        prod *= RunestonesModule.getTempMPSMultiplier();
+    }
+
+    // Challenge production restriction (half-production, no-buildings)
     if (typeof ChallengesModule !== 'undefined') {
         prod *= ChallengesModule.getProductionMultiplier();
     }
+
+    // Challenge reward MPS multiplier (permanent)
+    if (typeof ChallengesModule !== 'undefined') {
+        prod *= ChallengesModule.getMPSMultiplier();
+    }
+
+    // Prestige multiplier
+    if (typeof PrestigeModule !== 'undefined') {
+        prod *= PrestigeModule.getPrestigeMultiplier();
+    }
+
+    // Spellcasting MPS multiplier
+    if (typeof SpellcastingModule !== 'undefined') {
+        prod *= SpellcastingModule.getMPSMultiplier();
+    }
+
     return prod;
 }
 
