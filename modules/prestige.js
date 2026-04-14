@@ -173,7 +173,7 @@ const PrestigeModule = (function() {
     // Only applies the unlocked percentage of prestige power
     function getPrestigeMultiplier() {
         // Calculate raw prestige bonus from crystals
-        const rawPrestigeBonus = totalManaCrystalsEarned / 100;
+        const rawPrestigeBonus = totalManaCrystalsEarned / 50; // 2% per crystal
         // Apply only the unlocked percentage of this bonus
         const unlockedBonus = rawPrestigeBonus * (prestigePotentialUnlocked / 100);
 
@@ -208,7 +208,7 @@ const PrestigeModule = (function() {
     // Get total bonus percentage for display (shows unlocked amount)
     function getTotalBonusPercent() {
         // Only show the unlocked portion of prestige bonus
-        let bonus = totalManaCrystalsEarned * (prestigePotentialUnlocked / 100);
+        let bonus = totalManaCrystalsEarned * 2 * (prestigePotentialUnlocked / 100);
         prestigeUpgrades.forEach(upgrade => {
             if (upgrade.isPurchased && upgrade.mpsBonus) {
                 bonus += upgrade.mpsBonus * 100;

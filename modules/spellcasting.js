@@ -35,12 +35,12 @@ const SpellcastingModule = (function() {
         {
             id: 'stone-shape',
             name: 'Stone Shape',
-            description: 'Buildings cost 4% less for 60 seconds.',
+            description: 'Buildings cost 15% less for 60 seconds.',
             cost: 4,
             duration: 60,
             effect: {
                 type: 'buildingCostReduction',
-                value: 0.04
+                value: 0.15
             }
         },
         {
@@ -57,12 +57,12 @@ const SpellcastingModule = (function() {
         {
             id: 'click-sacrifices',
             name: 'Click Sacrifices',
-            description: 'MPS increased by 7x, but MPC halved for 90 seconds.',
+            description: 'MPS increased by 4x, but MPC halved for 60 seconds.',
             cost: 8,
-            duration: 90,
+            duration: 60,
             effect: {
                 type: 'clickSacrifices',
-                mpsMultiplier: 7,
+                mpsMultiplier: 4,
                 mpcMultiplier: 0.5
             }
         },
@@ -90,12 +90,12 @@ const SpellcastingModule = (function() {
         {
             id: 'arcane-legibility',
             name: 'Arcane Legibility',
-            description: 'Upgrades cost 2% less for 45 seconds.',
+            description: 'Upgrades cost 10% less for 45 seconds.',
             cost: 3,
             duration: 45,
             effect: {
                 type: 'upgradeCostReduction',
-                value: 0.02
+                value: 0.10
             }
         }
     ];

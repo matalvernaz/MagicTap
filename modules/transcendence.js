@@ -4,7 +4,7 @@ const TranscendenceModule = (function() {
     let totalArcaneEssenceEarned = 0;
     let timesTranscended = 0;
 
-    const TRANSCENDENCE_THRESHOLD = 100; // Minimum total crystals earned to transcend
+    const TRANSCENDENCE_THRESHOLD = 25; // Minimum total crystals earned to transcend
 
     const transcendenceUpgrades = [
         {
