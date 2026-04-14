@@ -944,7 +944,7 @@ const upgrades = [
         cost: 9500,
         effect: () => { mpsUpgradeMultiplier *= 1.01; recalculateMPS(); },
         isPurchased: false,
-        unlockCondition: () => AchievementsModule.getEarnedCount() >= 25,
+        unlockCondition: () => AchievementsModule.getEarnedCount() >= 12,
         isUnlocked: false,
         element: null
     },
@@ -956,7 +956,7 @@ const upgrades = [
         cost: 9500,
         effect: () => { manaPerClick += 10; },
         isPurchased: false,
-        unlockCondition: () => AchievementsModule.getEarnedCount() >= 25,
+        unlockCondition: () => AchievementsModule.getEarnedCount() >= 12,
         isUnlocked: false,
         element: null
     },
@@ -968,7 +968,7 @@ const upgrades = [
         cost: 11500,
         effect: () => { mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
         isPurchased: false,
-        unlockCondition: () => AchievementsModule.getEarnedCount() >= 25,
+        unlockCondition: () => AchievementsModule.getEarnedCount() >= 12,
         isUnlocked: false,
         element: null
     },

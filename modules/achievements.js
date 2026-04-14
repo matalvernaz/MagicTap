@@ -885,7 +885,102 @@ const AchievementsModule = (function() {
         condition: (stats) => buildings.find(b => b.id === 'magic-spire')?.owned >= 1000,
         isEarned: false
     },
+    // === HIGHER MANA MILESTONES ===
+    { id: 'mana-10q', name: 'Swimming In Mana', description: 'Have 10 quadrillion current Mana.', condition: (stats) => stats.currentMana >= 1e16, isEarned: false },
+    { id: 'mana-100q', name: 'Mana Ocean', description: 'Have 100 quadrillion current Mana.', condition: (stats) => stats.currentMana >= 1e17, isEarned: false },
+    { id: 'mana-1qi', name: 'Quintillion Dreams', description: 'Have 1 quintillion current Mana.', condition: (stats) => stats.currentMana >= 1e18, isEarned: false },
+    { id: 'mana-1sx', name: 'Sextillion Sorcery', description: 'Have 1 sextillion current Mana.', condition: (stats) => stats.currentMana >= 1e21, isEarned: false },
+    { id: 'mana-1sp', name: 'Septillion Sage', description: 'Have 1 septillion current Mana.', condition: (stats) => stats.currentMana >= 1e24, isEarned: false },
+    // === MPS MILESTONES ===
+    { id: 'mps-100', name: 'Trickle', description: 'Reach 100 Mana per second.', condition: () => manaPerSecond >= 100, isEarned: false },
+    { id: 'mps-1k', name: 'Stream', description: 'Reach 1,000 Mana per second.', condition: () => manaPerSecond >= 1000, isEarned: false },
+    { id: 'mps-10k', name: 'River', description: 'Reach 10,000 Mana per second.', condition: () => manaPerSecond >= 10000, isEarned: false },
+    { id: 'mps-100k', name: 'Torrent', description: 'Reach 100,000 Mana per second.', condition: () => manaPerSecond >= 100000, isEarned: false },
+    { id: 'mps-1m', name: 'Flood', description: 'Reach 1 million Mana per second.', condition: () => manaPerSecond >= 1e6, isEarned: false },
+    { id: 'mps-10m', name: 'Deluge', description: 'Reach 10 million Mana per second.', condition: () => manaPerSecond >= 1e7, isEarned: false },
+    { id: 'mps-100m', name: 'Tsunami', description: 'Reach 100 million Mana per second.', condition: () => manaPerSecond >= 1e8, isEarned: false },
+    { id: 'mps-1b', name: 'Cataclysm', description: 'Reach 1 billion Mana per second.', condition: () => manaPerSecond >= 1e9, isEarned: false },
+    { id: 'mps-10b', name: 'Apocalypse', description: 'Reach 10 billion Mana per second.', condition: () => manaPerSecond >= 1e10, isEarned: false },
+    { id: 'mps-100b', name: 'Armageddon', description: 'Reach 100 billion Mana per second.', condition: () => manaPerSecond >= 1e11, isEarned: false },
+    { id: 'mps-1t', name: 'Singularity', description: 'Reach 1 trillion Mana per second.', condition: () => manaPerSecond >= 1e12, isEarned: false },
+    // === CLICK MILESTONES (mana earned by clicking) ===
+    { id: 'click-1k', name: 'Dedicated Tapper', description: 'Earn 1,000 Mana from clicking.', condition: (stats) => stats.manaByClick >= 1000, isEarned: false },
+    { id: 'click-10k', name: 'Enthusiastic Tapper', description: 'Earn 10,000 Mana from clicking.', condition: (stats) => stats.manaByClick >= 10000, isEarned: false },
+    { id: 'click-100k', name: 'Obsessive Tapper', description: 'Earn 100,000 Mana from clicking.', condition: (stats) => stats.manaByClick >= 100000, isEarned: false },
+    { id: 'click-1m', name: 'Mana Tapper', description: 'Earn 1 million Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e6, isEarned: false },
+    { id: 'click-10m', name: 'Tap Master', description: 'Earn 10 million Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e7, isEarned: false },
+    { id: 'click-100m', name: 'Tap Legend', description: 'Earn 100 million Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e8, isEarned: false },
+    { id: 'click-1b', name: 'Tap God', description: 'Earn 1 billion Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e9, isEarned: false },
+    { id: 'click-10b', name: 'Tap Transcendent', description: 'Earn 10 billion Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e10, isEarned: false },
+    // === UPGRADE MILESTONES ===
+    { id: 'upgrades-10', name: 'Student', description: 'Purchase 10 upgrades.', condition: (stats) => stats.upgradesPurchased >= 10, isEarned: false },
+    { id: 'upgrades-25', name: 'Scholar', description: 'Purchase 25 upgrades.', condition: (stats) => stats.upgradesPurchased >= 25, isEarned: false },
+    { id: 'upgrades-50', name: 'Professor', description: 'Purchase 50 upgrades.', condition: (stats) => stats.upgradesPurchased >= 50, isEarned: false },
+    { id: 'upgrades-75', name: 'Dean', description: 'Purchase 75 upgrades.', condition: (stats) => stats.upgradesPurchased >= 75, isEarned: false },
+    { id: 'upgrades-100', name: 'Chancellor', description: 'Purchase 100 upgrades.', condition: (stats) => stats.upgradesPurchased >= 100, isEarned: false },
+    // === TOTAL BUILDINGS MILESTONES ===
+    { id: 'buildings-50', name: 'Small Village', description: 'Own 50 total buildings.', condition: (stats) => stats.totalBuildingsOwned >= 50, isEarned: false },
+    { id: 'buildings-100', name: 'Town', description: 'Own 100 total buildings.', condition: (stats) => stats.totalBuildingsOwned >= 100, isEarned: false },
+    { id: 'buildings-250', name: 'City', description: 'Own 250 total buildings.', condition: (stats) => stats.totalBuildingsOwned >= 250, isEarned: false },
+    { id: 'buildings-500', name: 'Metropolis', description: 'Own 500 total buildings.', condition: (stats) => stats.totalBuildingsOwned >= 500, isEarned: false },
+    { id: 'buildings-1000', name: 'Empire', description: 'Own 1000 total buildings.', condition: (stats) => stats.totalBuildingsOwned >= 1000, isEarned: false },
+    { id: 'buildings-2500', name: 'Dominion', description: 'Own 2500 total buildings.', condition: (stats) => stats.totalBuildingsOwned >= 2500, isEarned: false },
+    // === PRESTIGE MILESTONES ===
+    { id: 'prestige-1', name: 'First Ascension', description: 'Prestige for the first time.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() >= 1, isEarned: false },
+    { id: 'prestige-3', name: 'Getting The Hang Of It', description: 'Prestige 3 times.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() >= 3, isEarned: false },
+    { id: 'prestige-5', name: 'Seasoned Ascender', description: 'Prestige 5 times.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() >= 5, isEarned: false },
+    { id: 'prestige-10', name: 'Veteran Ascender', description: 'Prestige 10 times.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() >= 10, isEarned: false },
+    { id: 'prestige-25', name: 'Eternal Ascender', description: 'Prestige 25 times.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() >= 25, isEarned: false },
+    { id: 'prestige-50', name: 'Ascension Addict', description: 'Prestige 50 times.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() >= 50, isEarned: false },
+    // === CRYSTAL MILESTONES ===
+    { id: 'crystals-5', name: 'Crystal Collector', description: 'Earn 5 total Mana Crystals.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getPrestigeData().totalManaCrystalsEarned >= 5, isEarned: false },
+    { id: 'crystals-10', name: 'Crystal Hoarder', description: 'Earn 10 total Mana Crystals.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getPrestigeData().totalManaCrystalsEarned >= 10, isEarned: false },
+    { id: 'crystals-25', name: 'Crystal Baron', description: 'Earn 25 total Mana Crystals.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getPrestigeData().totalManaCrystalsEarned >= 25, isEarned: false },
+    { id: 'crystals-50', name: 'Crystal Tycoon', description: 'Earn 50 total Mana Crystals.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getPrestigeData().totalManaCrystalsEarned >= 50, isEarned: false },
+    { id: 'crystals-100', name: 'Crystal Emperor', description: 'Earn 100 total Mana Crystals.', condition: () => typeof PrestigeModule !== 'undefined' && PrestigeModule.getPrestigeData().totalManaCrystalsEarned >= 100, isEarned: false },
+    // === SPELL MILESTONES ===
+    { id: 'spells-1', name: 'First Incantation', description: 'Cast a spell.', condition: (stats) => stats.spellsCastTotal >= 1, isEarned: false },
+    { id: 'spells-10', name: 'Spellslinger', description: 'Cast 10 spells.', condition: (stats) => stats.spellsCastTotal >= 10, isEarned: false },
+    { id: 'spells-50', name: 'Frequent Caster', description: 'Cast 50 spells.', condition: (stats) => stats.spellsCastTotal >= 50, isEarned: false },
+    { id: 'spells-100', name: 'Spell Weaver', description: 'Cast 100 spells.', condition: (stats) => stats.spellsCastTotal >= 100, isEarned: false },
+    { id: 'spells-500', name: 'Spell Savant', description: 'Cast 500 spells.', condition: (stats) => stats.spellsCastTotal >= 500, isEarned: false },
+    // === WISHING WELL MILESTONES ===
+    { id: 'wishes-1', name: 'First Wish', description: 'Trigger a Wishing Well effect.', condition: () => typeof WishingWellModule !== 'undefined' && WishingWellModule.getEffectTriggerCount() >= 1, isEarned: false },
+    { id: 'wishes-10', name: 'Wishful Thinking', description: 'Trigger 10 Wishing Well effects.', condition: () => typeof WishingWellModule !== 'undefined' && WishingWellModule.getEffectTriggerCount() >= 10, isEarned: false },
+    { id: 'wishes-25', name: 'Lucky Star', description: 'Trigger 25 Wishing Well effects.', condition: () => typeof WishingWellModule !== 'undefined' && WishingWellModule.getEffectTriggerCount() >= 25, isEarned: false },
+    { id: 'wishes-50', name: 'Fortune Favors The Bold', description: 'Trigger 50 Wishing Well effects.', condition: () => typeof WishingWellModule !== 'undefined' && WishingWellModule.getEffectTriggerCount() >= 50, isEarned: false },
+    // === CHALLENGE MILESTONES ===
+    { id: 'challenge-1', name: 'Challenger', description: 'Complete 1 Ascension Challenge.', condition: () => typeof ChallengesModule !== 'undefined' && ChallengesModule.getSaveData().completedChallenges.length >= 1, isEarned: false },
+    { id: 'challenge-3', name: 'Proven', description: 'Complete 3 Ascension Challenges.', condition: () => typeof ChallengesModule !== 'undefined' && ChallengesModule.getSaveData().completedChallenges.length >= 3, isEarned: false },
+    { id: 'challenge-6', name: 'Unstoppable', description: 'Complete all 6 Ascension Challenges.', condition: () => typeof ChallengesModule !== 'undefined' && ChallengesModule.getSaveData().completedChallenges.length >= 6, isEarned: false },
+    // === TRANSCENDENCE MILESTONES ===
+    { id: 'transcend-1', name: 'Beyond', description: 'Transcend for the first time.', condition: () => typeof TranscendenceModule !== 'undefined' && TranscendenceModule.getSaveData().timesTranscended >= 1, isEarned: false },
+    { id: 'transcend-3', name: 'Ascended Being', description: 'Transcend 3 times.', condition: () => typeof TranscendenceModule !== 'undefined' && TranscendenceModule.getSaveData().timesTranscended >= 3, isEarned: false },
+    { id: 'transcend-5', name: 'Eternal', description: 'Transcend 5 times.', condition: () => typeof TranscendenceModule !== 'undefined' && TranscendenceModule.getSaveData().timesTranscended >= 5, isEarned: false },
+    // === SYNERGY MILESTONES ===
+    { id: 'synergy-10', name: 'Cooperative', description: 'Have a building synergy bonus reach +10%.', condition: () => buildings.some(b => getSynergyMultiplier(b.id) >= 1.10), isEarned: false },
+    { id: 'synergy-50', name: 'Symbiotic', description: 'Have a building synergy bonus reach +50%.', condition: () => buildings.some(b => getSynergyMultiplier(b.id) >= 1.50), isEarned: false },
+    { id: 'synergy-100', name: 'Perfectly Balanced', description: 'Have a building synergy bonus reach +100%.', condition: () => buildings.some(b => getSynergyMultiplier(b.id) >= 2.0), isEarned: false },
+    // === PROFICIENCY MILESTONES ===
+    { id: 'prof-50', name: 'Getting Somewhere', description: 'Reach 50% Magic Proficiency.', condition: () => typeof WizardRankModule !== 'undefined' && WizardRankModule.getMagicProficiency() >= 50, isEarned: false },
+    { id: 'prof-100', name: 'Competent', description: 'Reach 100% Magic Proficiency.', condition: () => typeof WizardRankModule !== 'undefined' && WizardRankModule.getMagicProficiency() >= 100, isEarned: false },
+    { id: 'prof-200', name: 'Masterful', description: 'Reach 200% Magic Proficiency.', condition: () => typeof WizardRankModule !== 'undefined' && WizardRankModule.getMagicProficiency() >= 200, isEarned: false },
+    { id: 'prof-500', name: 'Transcendent Knowledge', description: 'Reach 500% Magic Proficiency.', condition: () => typeof WizardRankModule !== 'undefined' && WizardRankModule.getMagicProficiency() >= 500, isEarned: false },
+    { id: 'prof-1000', name: 'Omniscient', description: 'Reach 1000% Magic Proficiency.', condition: () => typeof WizardRankModule !== 'undefined' && WizardRankModule.getMagicProficiency() >= 1000, isEarned: false },
+    // === TOTAL MANA EARNED (persists across prestiges) ===
+    { id: 'total-1t', name: 'Trillionaire', description: 'Earn 1 trillion total Mana across all runs.', condition: (stats) => stats.manaTotal >= 1e12, isEarned: false },
+    { id: 'total-100t', name: 'Hundred Trillionaire', description: 'Earn 100 trillion total Mana.', condition: (stats) => stats.manaTotal >= 1e14, isEarned: false },
+    { id: 'total-1q', name: 'Quadrillionaire', description: 'Earn 1 quadrillion total Mana.', condition: (stats) => stats.manaTotal >= 1e15, isEarned: false },
+    { id: 'total-1qi', name: 'Quintillionaire', description: 'Earn 1 quintillion total Mana.', condition: (stats) => stats.manaTotal >= 1e18, isEarned: false },
+    { id: 'total-1sx', name: 'Sextillionaire', description: 'Earn 1 sextillion total Mana.', condition: (stats) => stats.manaTotal >= 1e21, isEarned: false },
+    // === MANA PER CLICK MILESTONES ===
+    { id: 'mpc-100', name: 'Heavy Hitter', description: 'Reach 100 Mana per click.', condition: () => manaPerClick >= 100, isEarned: false },
+    { id: 'mpc-1k', name: 'Power Tap', description: 'Reach 1,000 Mana per click.', condition: () => manaPerClick >= 1000, isEarned: false },
+    { id: 'mpc-10k', name: 'Mighty Tap', description: 'Reach 10,000 Mana per click.', condition: () => manaPerClick >= 10000, isEarned: false },
+    { id: 'mpc-100k', name: 'Devastating Tap', description: 'Reach 100,000 Mana per click.', condition: () => manaPerClick >= 100000, isEarned: false },
+    { id: 'mpc-1m', name: 'World-Shaking Tap', description: 'Reach 1 million Mana per click.', condition: () => manaPerClick >= 1e6, isEarned: false },
     ];
+
 
     let earnedCount = 0;
 

@@ -2,9 +2,9 @@
 const RankingUpgradesModule = (function() {
     // Achievement thresholds for category unlocks
     const RANK_THRESHOLDS = {
-        WIZARDRIES: 25,    // Rank 2 (Initiate)
-        FAMILIARS: 50,     // Rank 3 (Novice)
-        ENCHANTMENTS: 100  // Rank 5 (Journeyman)
+        WIZARDRIES: 3,     // Rank 2 (Initiate)
+        FAMILIARS: 7,      // Rank 3 (Novice)
+        ENCHANTMENTS: 18   // Rank 5 (Journeyman)
     };
 
     // Familiars - MPS boost, sorted by cost
