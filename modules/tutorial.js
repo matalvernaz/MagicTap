@@ -31,7 +31,7 @@ const TutorialModule = (function() {
             trigger: 'firstBuilding' // After buying first building
         },
         {
-            text: 'You are learning quickly. The path of a wizard is long: you will discover new schools of magic, construct ley lines that draw power from the earth itself, and eventually learn to crystallize Mana into permanent form. Some say the truly powerful can even transcend their mortal limits through a ritual called Prestige \u2014 sacrificing everything to be reborn stronger. But that is a tale for another day. For now, gather. Build. Learn. Your journey has only just begun.',
+            text: 'You are learning quickly. The path of a wizard is long: you will discover new schools of magic, construct ley lines that draw power from the earth itself, and eventually learn to crystallize Mana into permanent form. Every milestone you reach will be recognized \u2014 achievements increase your Magic Proficiency, which makes everything you build more powerful. Some say the truly powerful can even transcend their mortal limits through a ritual called Prestige \u2014 sacrificing everything to be reborn stronger. But that is a tale for another day. For now, gather. Build. Learn. Your journey has only just begun.',
             buttonText: 'Begin my journey',
             buttonLabel: 'Complete the tutorial and begin playing',
             trigger: 'firstUpgrade' // After buying first upgrade
