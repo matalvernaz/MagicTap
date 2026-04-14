@@ -255,12 +255,25 @@ const FlavorEventsModule = (function() {
     function showInteractiveEvent(available) {
         if (!eventsLog) return;
 
+        // Play sound to alert the player
+        if (typeof SoundModule !== 'undefined') {
+            SoundModule.play('menuOpen');
+        }
+
+        // Screen reader announcement
+        const srAlert = document.createElement('span');
+        srAlert.className = 'sr-only';
+        srAlert.setAttribute('role', 'alert');
+        srAlert.textContent = 'An interactive event has appeared in the events log.';
+        eventsLog.appendChild(srAlert);
+        setTimeout(() => srAlert.remove(), 2000);
+
         const event = available[Math.floor(Math.random() * available.length)];
 
         const eventElement = document.createElement('div');
         eventElement.className = 'flavor-event interactive-event';
         eventElement.setAttribute('role', 'region');
-        eventElement.setAttribute('aria-label', 'Interactive event');
+        eventElement.setAttribute('aria-label', 'Interactive event: ' + event.text);
 
         const textSpan = document.createElement('span');
         textSpan.className = 'interactive-event-text';

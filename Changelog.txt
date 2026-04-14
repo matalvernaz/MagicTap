@@ -54,3 +54,11 @@ Runestone spawn rate can now be boosted by prestige upgrade.
 Spell Power regeneration can now be boosted by prestige upgrade.
 Wishing Well coin generation can now be boosted by prestige upgrade.
 Accessibility maintained across all new features (ARIA labels, keyboard navigation, screen reader announcements).
+V.0.9, 04-13-2026:
+Building Synergies - each building now gets a production bonus from owning another building type, creating strategic buy-order decisions. Synergy bonuses shown in gold text with live percentage updates.
+Ascension Challenges - 6 challenge runs with restrictions and permanent rewards: Blind Tap, Lone Hand, Drought, Raw Power, Diminishing Returns, and Speed Demon. Accessible from the Challenges navigation button once prestige unlocks.
+Progressive Disclosure - Events, Production, and Prestige sections are hidden until relevant, reducing clutter for new players.
+Interactive events now play a sound and announce to screen readers when they appear.
+Synergy display is fully accessible with live-updating aria-labels showing current bonus percentage.
+Fixed Spellcasting panel not opening (init order bug since V.0.7).
+Fixed bulk buy buttons not visually highlighting the active selection.

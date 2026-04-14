@@ -2,6 +2,17 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '0.9',
+            date: '04-13-26',
+            summary: `Building Synergies - buildings boost each other based on ownership, creating strategic depth.
+Ascension Challenges - 6 challenge runs with restrictions and permanent rewards.
+Progressive Disclosure - UI sections hidden until relevant, reducing new-player clutter.
+Interactive events now play a sound and announce to screen readers.
+Synergy display is fully accessible with live bonus percentages.
+Fixed Spellcasting panel not opening (init order bug).
+Fixed bulk buy button highlighting.`
+        },
+        {
             version: '0.8',
             date: '04-13-26',
             summary: `Offline Progress - earn Mana while away (50% rate, capped at 8 hours).

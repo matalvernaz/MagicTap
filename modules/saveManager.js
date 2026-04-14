@@ -283,6 +283,7 @@ const SaveManager = (function() {
                 updateDisplay();
                 updateWishingWellButton();
                 updateRankingUpgradesButton();
+                if (typeof updateSectionVisibility === 'function') updateSectionVisibility();
 
                 // Apply offline progress
                 if (offlineProgress && offlineProgress.earned > 0) {

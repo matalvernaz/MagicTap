@@ -1,4 +1,4 @@
-const VERSION = '0.7';
+const VERSION = '0.9';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -1674,7 +1674,13 @@ function createBuildingElement(building) {
     buildingDiv.setAttribute('aria-labelledby', `building-name-${building.id}`);
 
     const synergy = buildingSynergies[building.id];
-    const synergyHTML = synergy ? `<p class="building-synergy" aria-label="Synergy bonus: ${synergy.label}">Synergy: ${synergy.label}</p>` : '';
+    let synergyHTML = '';
+    if (synergy) {
+        const sourceBuilding = buildings.find(b => b.id === synergy.source);
+        const sourceCount = sourceBuilding ? sourceBuilding.owned : 0;
+        const bonusPct = (sourceCount * synergy.rate * 100).toFixed(1);
+        synergyHTML = `<p class="building-synergy" aria-label="Synergy: ${synergy.label}, currently plus ${bonusPct} percent">Synergy: ${synergy.label} (currently +${bonusPct}%)</p>`;
+    }
 
     buildingDiv.innerHTML = `
         <p id="building-name-${building.id}" class="building-name">${building.name}</p>
@@ -1699,6 +1705,17 @@ function updateBuildingDisplay(building) {
     const amount = getEffectiveBulkAmount(building);
     const cost = amount > 0 ? getEffectiveBulkCost(building) : getBuildingCurrentCost(building);
     building.element.querySelector('.building-cost .cost-value').textContent = OptionsModule.formatNumber(Math.floor(cost));
+
+    // Update synergy display with current bonus
+    const synergyEl = building.element.querySelector('.building-synergy');
+    const synergy = buildingSynergies[building.id];
+    if (synergyEl && synergy) {
+        const sourceBuilding = buildings.find(b => b.id === synergy.source);
+        const sourceCount = sourceBuilding ? sourceBuilding.owned : 0;
+        const bonusPct = (sourceCount * synergy.rate * 100).toFixed(1);
+        synergyEl.textContent = `Synergy: ${synergy.label} (currently +${bonusPct}%)`;
+        synergyEl.setAttribute('aria-label', `Synergy: ${synergy.label}, currently plus ${bonusPct} percent`);
+    }
 }
 
 function renderBuildings() {
@@ -1738,6 +1755,32 @@ function checkUnlocks() {
 
     // Check Wishing Well button visibility
     updateWishingWellButton();
+
+    // Progressive disclosure - show sections as they become relevant
+    updateSectionVisibility();
+}
+
+function updateSectionVisibility() {
+    // Show events section once you have any building production
+    const hasBuildings = buildings.some(b => b.owned > 0);
+    const eventsHeading = document.getElementById('events-heading');
+    const eventsLog = document.getElementById('events-log');
+    if (hasBuildings && eventsHeading) {
+        eventsHeading.style.display = '';
+        if (eventsLog) eventsLog.style.display = '';
+    }
+
+    // Show production button once you own a building
+    const productionBtn = document.getElementById('production-button');
+    if (productionBtn && hasBuildings) {
+        productionBtn.style.display = '';
+    }
+
+    // Show prestige button once prestige is relevant
+    const prestigeBtn = document.getElementById('prestige-button');
+    if (prestigeBtn && PrestigeModule.shouldShowPrestige()) {
+        prestigeBtn.style.display = '';
+    }
 }
 
 // --- Upgrade Logic ---
