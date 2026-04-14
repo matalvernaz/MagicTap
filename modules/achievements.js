@@ -1010,17 +1010,17 @@ const AchievementsModule = (function() {
         }
     }
 
-    function showNotification(achievementName) {
+    function showNotification(achievementName, achievementDescription) {
         const notificationArea = document.getElementById('notification-area');
         if (!notificationArea) return;
 
-        // Live announcement - only says "New Achievement!" (announced immediately, then removed)
+        // Live announcement
         const liveAnnouncement = document.createElement('span');
         liveAnnouncement.className = 'sr-only';
         liveAnnouncement.setAttribute('role', 'alert');
-        liveAnnouncement.textContent = 'New Achievement!';
+        liveAnnouncement.textContent = `New Achievement: ${achievementName}. ${achievementDescription}`;
         notificationArea.appendChild(liveAnnouncement);
-        setTimeout(() => liveAnnouncement.remove(), 1000);
+        setTimeout(() => liveAnnouncement.remove(), 3000);
 
         // Visible notification - fully accessible when user navigates to it
         const notification = document.createElement('div');
@@ -1041,7 +1041,7 @@ const AchievementsModule = (function() {
 
         const content = document.createElement('p');
         content.className = 'notification-content';
-        content.textContent = achievementName;
+        content.textContent = `${achievementName} — ${achievementDescription}`;
 
         notification.appendChild(dismissBtn);
         notification.appendChild(title);
@@ -1100,7 +1100,7 @@ const AchievementsModule = (function() {
                 earnedCount++;
                 newAchievements = true;
                 StatisticsModule.addAchievementEarned();
-                showNotification(achievement.name);
+                showNotification(achievement.name, achievement.description);
 
                 // Play achievement sound
                 if (typeof SoundModule !== 'undefined') {

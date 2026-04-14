@@ -2,6 +2,18 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '1.1',
+            date: '04-14-26',
+            summary: `79 new achievements (201 total) covering MPS, clicks, prestiges, challenges, spells, synergies, and more.
+Wizard ranks rescaled from 0-1500 to 0-201 — all 58 ranks are now reachable.
+5 MPS-scaling click upgrades (Mana Tap through Godhand) — clicking stays relevant all game.
+35 new building upgrades at milestone 50 and 100 for all buildings.
+Eternal Slumber transcendence upgrade increases offline cap from 8 to 24 hours.
+Achievement notifications now show the description of what you earned.
+Balance: Magic Library/Spire production fixed, Click Sacrifices rebalanced, spells buffed, prestige bonus doubled, Mana-Touched chain has escalating costs, transcendence threshold lowered.
+Fixed: Wishing Well buttons unclickable, Coin Shower exploit, Fire Elemental cost blocking Lava Elemental, runestone timer stuck at 1s.`
+        },
+        {
             version: '1.0',
             date: '04-13-26',
             summary: `Transcendence - second prestige layer with Arcane Essence currency and 10 endgame upgrades.

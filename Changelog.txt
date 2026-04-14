@@ -79,3 +79,18 @@ Fixed runestone and wishing well notifications (were silently broken since origi
 Fixed wishing well softlock: coins now generate from zero instead of requiring coins to earn coins.
 Fixed synergy display not updating when buying other buildings.
 Fixed per-building production display to include all multipliers accurately.
+V.1.1, 04-14-2026:
+79 new achievements (201 total) covering MPS milestones, click mana, prestiges, challenges, spells, wishing well, synergies, proficiency, and total mana earned.
+Wizard ranks rescaled - all 58 ranks from Mana-Blind to Living Spell are now reachable with 201 achievements (was 0-1500, only 4 ranks reachable).
+5 MPS-scaling click upgrades (Mana Tap, Deeper Tap, Arcane Siphon, Transcendent Tap, Godhand) - clicking grants up to 39% of MPS, keeping it relevant throughout the game.
+35 new building ownership upgrades at milestones 50 and 100 for all buildings.
+Eternal Slumber transcendence upgrade increases offline cap from 8 to 24 hours.
+Achievement notifications now show the description explaining how you earned them.
+Active spells shown on main screen with countdown timers.
+Spell casting announced to screen readers.
+Balance pass: Magic Library/Spire production curve fixed, Click Sacrifices rebalanced, Stone Shape/Arcane Legibility buffed, prestige crystal bonus doubled to 2%, Mana-Touched chain now has escalating costs, transcendence threshold lowered to 25 crystals.
+Fixed Wishing Well buttons being unclickable (DOM rebuild race condition).
+Fixed Coin Shower exploit (rebalanced cost/reward).
+Fixed Fire Elemental cost blocking Lava Elemental familiar progression.
+Fixed runestone effect timer stuck at 1s remaining.
+Fixed active spell timer spamming screen reader.
