@@ -2449,8 +2449,32 @@ function checkUnlocks() {
 }
 
 function updateSectionVisibility() {
-    // Show events section once you have any building production
     const hasBuildings = buildings.some(b => b.owned > 0);
+    const canAffordBuilding = mana >= 10; // Wizard's Hand costs 10
+
+    // Show buildings section once you can almost afford one
+    const buildingsHeading = document.getElementById('buildings-heading');
+    const buildingsContainer = document.getElementById('buildings-container');
+    if (canAffordBuilding && buildingsHeading) {
+        buildingsHeading.style.display = '';
+        if (buildingsContainer) buildingsContainer.style.display = '';
+        // Also show bulk buy controls
+        const bulkControls = document.querySelector('.bulk-buy-controls');
+        if (bulkControls) bulkControls.style.display = '';
+    }
+
+    // Show upgrades section once you own a building
+    const upgradesHeading = document.getElementById('upgrades-heading');
+    const upgradesContainer = document.getElementById('upgrades-container');
+    if (hasBuildings && upgradesHeading) {
+        upgradesHeading.style.display = '';
+        if (upgradesContainer) upgradesContainer.style.display = '';
+        // Also show buy-all button if it exists
+        const buyAllBtn = document.getElementById('buy-all-upgrades-button');
+        if (buyAllBtn) buyAllBtn.style.removeProperty('display');
+    }
+
+    // Show events section once you have any building production
     const eventsHeading = document.getElementById('events-heading');
     const eventsLog = document.getElementById('events-log');
     if (hasBuildings && eventsHeading) {
@@ -3063,6 +3087,7 @@ function createBulkBuyControls() {
 
     const controls = document.createElement('div');
     controls.className = 'bulk-buy-controls';
+    controls.style.display = 'none'; // Hidden until buildings section is shown
     controls.setAttribute('role', 'radiogroup');
     controls.setAttribute('aria-label', 'Bulk buy amount');
 
