@@ -140,10 +140,11 @@ const WishingWellModule = (function() {
         }
     ];
 
-    // Coin generation rate (coins per second, starts very slow)
+    // Coin generation rate (coins per second)
     function getCoinGenerationRate() {
-        // Snowball effect: more coins = faster generation
-        return coins / 150;
+        // Base rate so coins always trickle in, plus snowball effect
+        const baseRate = 0.02; // ~1 coin per 50 seconds
+        return baseRate + (coins / 150);
     }
 
     function addCoins(amount) {
@@ -163,6 +164,7 @@ const WishingWellModule = (function() {
         <section id="wishing-well-panel" class="game-panel" hidden>
             <h2 id="wishing-well-heading" tabindex="-1">Wishing Well</h2>
             <div id="wishing-well-container" aria-labelledby="wishing-well-heading">
+                <p class="wishing-well-description">Coins accumulate slowly over time. The more coins you have, the faster new ones appear. Spend them on effects below — but beware, there is a 15% chance the well backfires.</p>
                 <div class="wishing-well-status">
                     <p>Coins: <span id="wishing-well-coins">0</span> / <span id="wishing-well-max-coins">15</span></p>
                     <p>Well Level: <span id="wishing-well-level">1</span></p>
