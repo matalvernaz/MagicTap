@@ -42,14 +42,14 @@ const WishingWellModule = (function() {
         {
             id: 'coin-shower',
             name: 'Coin Shower',
-            description: 'Instantly gain 5 Wishing Well coins.',
-            cost: 8,
+            description: 'Instantly gain 6 Wishing Well coins.',
+            cost: 3,
             duration: 0,
             isPositive: true,
             isInstant: true,
             backfireId: 'coin-tax',
             apply: function() {
-                coins = Math.min(coins + 5, maxCoins);
+                coins = Math.min(coins + 6, maxCoins);
             }
         },
         {
@@ -184,7 +184,7 @@ const WishingWellModule = (function() {
 
     // Well level upgrade costs
     function getLevelUpCost() {
-        return [0, 50, 150, 500][level] || Infinity; // Cost in coins for level 1->2, 2->3, 3->4
+        return [0, 5, 15, 30][level] || Infinity; // Total effects triggered needed for level 2, 3, 4
     }
 
     function canLevelUp() {
