@@ -3203,8 +3203,8 @@ document.addEventListener('keydown', (e) => {
 
 // --- Unsaved Progress Warning ---
 window.addEventListener('beforeunload', (e) => {
-    // Save before leaving
-    if (typeof SaveManager !== 'undefined') {
+    // Save before leaving (unless we're resetting)
+    if (typeof SaveManager !== 'undefined' && !SaveManager.isGameResetting()) {
         SaveManager.save();
     }
 });

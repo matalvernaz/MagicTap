@@ -377,15 +377,27 @@ const SaveManager = (function() {
         }
     }
 
+    let isResetting = false;
+
     function resetGame() {
+        // Set flag to prevent beforeunload from re-saving
+        isResetting = true;
+
         // Stop auto-save to prevent saving during reset
         stopAutoSave();
 
         // Clear the save data from localStorage
         localStorage.removeItem(SAVE_KEY);
 
+        // Also clear tutorial completion
+        localStorage.removeItem('magictap_tutorial_complete');
+
         // Force reload the page to ensure clean state
         window.location.href = window.location.href;
+    }
+
+    function isGameResetting() {
+        return isResetting;
     }
 
     function startAutoSave(intervalSeconds) {
@@ -418,6 +430,7 @@ const SaveManager = (function() {
         exportSave,
         importSave,
         resetGame,
+        isGameResetting,
         startAutoSave,
         stopAutoSave,
         init
