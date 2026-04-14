@@ -19,22 +19,30 @@ const TutorialModule = (function() {
             highlight: 'gather-mana-button'
         },
         {
-            text: 'You can feel it now \u2014 a trickle of power, small but real. The Mana responds to your intent. With enough of it, you could summon spectral hands to gather for you, even while you rest. Look to the buildings below.',
+            text: 'You can feel it now \u2014 a trickle of power, small but real. The Mana responds to your intent. With enough of it, you could summon spectral hands to gather for you, even while you rest. Keep gathering \u2014 you will need 10 Mana to summon your first.',
+            buttonText: 'Keep gathering',
+            buttonLabel: 'Dismiss and keep gathering Mana',
+            trigger: 'firstClick'
+        },
+        {
+            text: 'You have enough Mana to shape it into form. Below you will find Buildings \u2014 spectral constructs that gather Mana on your behalf, even while you rest. Try purchasing a Wizard\'s Hand.',
             buttonText: 'Show me',
             buttonLabel: 'Dismiss and explore buildings',
-            trigger: 'firstClick' // After first mana gather
+            trigger: 'buildingsVisible',
+            highlight: 'buildings-heading'
         },
         {
             text: 'Excellent. Your first Wizard\'s Hand works tirelessly, pulling Mana from the aether. But raw gathering is inefficient. Study the arcane arts \u2014 upgrades will amplify everything you do. Each one is a step on your path to mastery.',
             buttonText: 'I will study',
             buttonLabel: 'Dismiss and explore upgrades',
-            trigger: 'firstBuilding' // After buying first building
+            trigger: 'firstBuilding',
+            highlight: 'upgrades-heading'
         },
         {
             text: 'You are learning quickly. The path of a wizard is long: you will discover new schools of magic, construct ley lines that draw power from the earth itself, and eventually learn to crystallize Mana into permanent form. Every milestone you reach will be recognized \u2014 achievements increase your Magic Proficiency, which makes everything you build more powerful. Some say the truly powerful can even transcend their mortal limits through a ritual called Prestige \u2014 sacrificing everything to be reborn stronger. But that is a tale for another day. For now, gather. Build. Learn. Your journey has only just begun.',
             buttonText: 'Begin my journey',
             buttonLabel: 'Complete the tutorial and begin playing',
-            trigger: 'firstUpgrade' // After buying first upgrade
+            trigger: 'firstUpgrade'
         }
     ];
 

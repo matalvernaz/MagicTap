@@ -2455,12 +2455,14 @@ function updateSectionVisibility() {
     // Show buildings section once you can almost afford one
     const buildingsHeading = document.getElementById('buildings-heading');
     const buildingsContainer = document.getElementById('buildings-container');
-    if (canAffordBuilding && buildingsHeading) {
+    if (canAffordBuilding && buildingsHeading && buildingsHeading.style.display === 'none') {
         buildingsHeading.style.display = '';
         if (buildingsContainer) buildingsContainer.style.display = '';
         // Also show bulk buy controls
         const bulkControls = document.querySelector('.bulk-buy-controls');
         if (bulkControls) bulkControls.style.display = '';
+        // Tutorial trigger
+        if (typeof TutorialModule !== 'undefined') TutorialModule.checkTriggers('buildingsVisible');
     }
 
     // Show upgrades section once you own a building
