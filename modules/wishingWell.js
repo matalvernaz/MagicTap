@@ -12,6 +12,7 @@ const WishingWellModule = (function() {
     let effectTimeRemaining = 0;
     let effectTimerId = null;
     let mpsMultiplier = 1;
+    let mpcMultiplier = 1;
 
     // Backfire chance (15% chance of getting negative effect)
     const BACKFIRE_CHANCE = 0.15;
@@ -32,9 +33,108 @@ const WishingWellModule = (function() {
             id: 'mana-leak',
             name: 'Mana Leak',
             description: 'Mana per second halved for 30 seconds.',
-            cost: 0, // Backfire effect, not purchasable directly
+            cost: 0,
             duration: 30,
             multiplier: 0.5,
+            isPositive: false,
+            isBackfire: true
+        },
+        {
+            id: 'coin-shower',
+            name: 'Coin Shower',
+            description: 'Instantly gain 5 Wishing Well coins.',
+            cost: 8,
+            duration: 0,
+            isPositive: true,
+            isInstant: true,
+            backfireId: 'coin-tax',
+            apply: function() {
+                coins = Math.min(coins + 5, maxCoins);
+            }
+        },
+        {
+            id: 'coin-tax',
+            name: 'Coin Tax',
+            description: 'Lose 3 Wishing Well coins.',
+            cost: 0,
+            duration: 0,
+            isPositive: false,
+            isBackfire: true,
+            isInstant: true,
+            apply: function() {
+                coins = Math.max(0, coins - 3);
+            }
+        },
+        {
+            id: 'mana-vortex',
+            name: 'Mana Vortex',
+            description: 'Gain 60 seconds of production instantly.',
+            cost: 12,
+            duration: 0,
+            isPositive: true,
+            isInstant: true,
+            backfireId: 'mana-drain',
+            apply: function() {
+                const grant = (typeof getEffectiveMPS === 'function' ? getEffectiveMPS() : manaPerSecond) * 60;
+                mana += grant;
+                if (typeof StatisticsModule !== 'undefined') {
+                    StatisticsModule.addManaByBuildings(grant);
+                }
+            }
+        },
+        {
+            id: 'mana-drain',
+            name: 'Mana Drain',
+            description: 'Lose 10% of current Mana.',
+            cost: 0,
+            duration: 0,
+            isPositive: false,
+            isBackfire: true,
+            isInstant: true,
+            apply: function() {
+                mana *= 0.9;
+            }
+        },
+        {
+            id: 'click-frenzy',
+            name: 'Click Frenzy',
+            description: 'Mana per click x10 for 15 seconds.',
+            cost: 7,
+            duration: 15,
+            multiplier: 1, // MPS multiplier stays at 1
+            mpcMultiplier: 10,
+            isPositive: true,
+            backfireId: 'clumsy-wish'
+        },
+        {
+            id: 'clumsy-wish',
+            name: 'Clumsy Wish',
+            description: 'Mana per click reduced to 1 for 15 seconds.',
+            cost: 0,
+            duration: 15,
+            multiplier: 1,
+            mpcMultiplier: 0,
+            isPositive: false,
+            isBackfire: true
+        },
+        {
+            id: 'arcane-blessing',
+            name: 'Arcane Blessing',
+            description: 'Mana per second tripled for 20 seconds.',
+            cost: 14,
+            duration: 20,
+            multiplier: 3,
+            isPositive: true,
+            backfireId: 'arcane-curse',
+            minLevel: 2
+        },
+        {
+            id: 'arcane-curse',
+            name: 'Arcane Curse',
+            description: 'Mana per second reduced to 25% for 20 seconds.',
+            cost: 0,
+            duration: 20,
+            multiplier: 0.25,
             isPositive: false,
             isBackfire: true
         }
@@ -80,14 +180,51 @@ const WishingWellModule = (function() {
         </section>`;
     }
 
+    // Well level upgrade costs
+    function getLevelUpCost() {
+        return [0, 50, 150, 500][level] || Infinity; // Cost in coins for level 1->2, 2->3, 3->4
+    }
+
+    function canLevelUp() {
+        return level < 4 && effectTriggerCount >= getLevelUpCost();
+    }
+
+    function levelUp() {
+        if (!canLevelUp()) return;
+        level++;
+        maxCoins += 5; // +5 max coins per level
+        updateDisplay();
+        renderEffects();
+    }
+
     function renderEffects() {
         const container = document.getElementById('wishing-well-effects-list');
         if (!container) return;
 
         container.innerHTML = '';
 
-        // Only show purchasable effects (not backfire effects)
-        const purchasableEffects = effects.filter(e => !e.isBackfire);
+        // Show level up button if available
+        if (canLevelUp()) {
+            const levelUpDiv = document.createElement('div');
+            levelUpDiv.className = 'wishing-well-effect-item';
+            const levelUpBtn = document.createElement('button');
+            levelUpBtn.className = 'effect-button';
+            levelUpBtn.setAttribute('aria-label', `Level up Wishing Well to level ${level + 1}. Requires ${getLevelUpCost()} total effects triggered.`);
+            levelUpBtn.innerHTML = `
+                <span class="effect-name">Level Up Well</span>
+                <span class="effect-cost">Level ${level + 1}</span>
+            `;
+            levelUpBtn.addEventListener('click', levelUp);
+            const levelDesc = document.createElement('p');
+            levelDesc.className = 'effect-description';
+            levelDesc.textContent = `Increase max coins to ${maxCoins + 5} and unlock new effects. Requires ${getLevelUpCost()} total effects triggered.`;
+            levelUpDiv.appendChild(levelUpBtn);
+            levelUpDiv.appendChild(levelDesc);
+            container.appendChild(levelUpDiv);
+        }
+
+        // Only show purchasable effects (not backfire effects) that meet level requirement
+        const purchasableEffects = effects.filter(e => !e.isBackfire && (!e.minLevel || level >= e.minLevel));
 
         purchasableEffects.forEach(effect => {
             const effectDiv = document.createElement('div');
@@ -147,14 +284,24 @@ const WishingWellModule = (function() {
             }
         }
 
-        // Activate the effect
+        // Handle instant effects
+        if (finalEffect.isInstant && finalEffect.apply) {
+            finalEffect.apply();
+            effectTriggerCount++;
+            updateDisplay();
+            renderEffects();
+            return;
+        }
+
+        // Activate timed effect
         activateEffect(finalEffect);
     }
 
     function activateEffect(effect) {
         activeEffect = effect;
         effectTimeRemaining = effect.duration;
-        mpsMultiplier = effect.multiplier;
+        mpsMultiplier = effect.multiplier || 1;
+        mpcMultiplier = effect.mpcMultiplier !== undefined ? effect.mpcMultiplier : 1;
         effectTriggerCount++;
 
         // Recalculate MPS with new multiplier
@@ -189,6 +336,7 @@ const WishingWellModule = (function() {
         activeEffect = null;
         effectTimeRemaining = 0;
         mpsMultiplier = 1;
+        mpcMultiplier = 1;
 
         // Recalculate MPS without effect
         if (typeof recalculateMPS === 'function') {
@@ -236,6 +384,10 @@ const WishingWellModule = (function() {
 
     function getMPSMultiplier() {
         return mpsMultiplier;
+    }
+
+    function getMPCMultiplier() {
+        return mpcMultiplier;
     }
 
     function getEffectTriggerCount() {
@@ -302,6 +454,7 @@ const WishingWellModule = (function() {
         getMaxCoins,
         getLevel,
         getMPSMultiplier,
+        getMPCMultiplier,
         getEffectTriggerCount,
         addCoins,
         getCoinGenerationRate,

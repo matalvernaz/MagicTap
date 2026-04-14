@@ -2,6 +2,17 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '0.8',
+            date: '04-13-26',
+            summary: `Offline Progress - earn Mana while away (50% rate, capped at 8 hours).
+Floating click numbers - visual "+X" feedback when gathering Mana.
+Bulk Buy - toggle between x1, x10, x100, or Max for buildings.
+Expanded Wishing Well - 4 new effects and well leveling system.
+Expanded Prestige Store - 8 new upgrades including Auto-Gather, Head Start, and more.
+Interactive Events - occasional choices with risk/reward in the events log.
+Accessibility maintained across all new features.`
+        },
+        {
             version: '0.7',
             date: '02-05-26',
             summary: `MagicTap now has sound! Sounds contributed by Pitermach.

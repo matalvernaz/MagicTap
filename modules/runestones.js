@@ -286,7 +286,12 @@ const RunestonesModule = (function() {
     ];
 
     function getRandomSpawnInterval() {
-        return Math.floor(Math.random() * (MAX_SPAWN_INTERVAL - MIN_SPAWN_INTERVAL)) + MIN_SPAWN_INTERVAL;
+        let interval = Math.floor(Math.random() * (MAX_SPAWN_INTERVAL - MIN_SPAWN_INTERVAL)) + MIN_SPAWN_INTERVAL;
+        // Runestone Affinity prestige upgrade: 30% faster spawns
+        if (typeof PrestigeModule !== 'undefined' && PrestigeModule.hasRunestoneBoost && PrestigeModule.hasRunestoneBoost()) {
+            interval = Math.floor(interval * 0.7);
+        }
+        return interval;
     }
 
     function init() {

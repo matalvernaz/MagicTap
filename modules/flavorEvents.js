@@ -47,6 +47,114 @@ const FlavorEventsModule = (function() {
         { text: 'Lightning arcs between the spires, dancing with arcane purpose.', unlockCondition: () => buildings.find(b => b.id === 'magic-spire')?.owned >= 1 },
     ];
 
+    // Interactive events - these offer a choice with risk/reward
+    const interactiveEvents = [
+        {
+            id: 'wandering-merchant',
+            text: 'A wandering merchant offers to trade...',
+            buttonText: 'Trade',
+            buttonLabel: 'Trade with the wandering merchant for a chance at bonus Mana',
+            unlockCondition: () => mana >= 100,
+            action: () => {
+                const cost = manaPerSecond * 10; // 10 seconds of production
+                if (mana >= cost && cost > 0) {
+                    mana -= cost;
+                    const reward = cost * (1.5 + Math.random() * 2); // 1.5x to 3.5x return
+                    mana += reward;
+                    return `The merchant's wares prove valuable! Gained ${formatInteractiveNumber(reward - cost)} Mana.`;
+                }
+                return 'You have nothing the merchant wants.';
+            }
+        },
+        {
+            id: 'mana-surge-event',
+            text: 'A wild surge of Mana erupts nearby!',
+            buttonText: 'Channel It',
+            buttonLabel: 'Attempt to channel the wild Mana surge',
+            unlockCondition: () => manaPerSecond > 0,
+            action: () => {
+                if (Math.random() < 0.7) {
+                    const bonus = manaPerSecond * 30;
+                    mana += bonus;
+                    if (typeof StatisticsModule !== 'undefined') StatisticsModule.addManaByBuildings(bonus);
+                    return `You successfully channel the surge! +${formatInteractiveNumber(bonus)} Mana.`;
+                } else {
+                    return 'The surge was too powerful and dissipates before you can harness it.';
+                }
+            }
+        },
+        {
+            id: 'ancient-tome',
+            text: 'You discover a dusty tome hidden behind a bookshelf...',
+            buttonText: 'Read It',
+            buttonLabel: 'Read the ancient tome for a temporary boost',
+            unlockCondition: () => (typeof StatisticsModule !== 'undefined' && StatisticsModule.getStats().upgradesPurchased >= 5),
+            action: () => {
+                // Temporary MPS boost via a quick runestone-like effect
+                if (typeof RunestonesModule !== 'undefined') {
+                    RunestonesModule.spawnRunestone();
+                    return 'The tome\'s knowledge summons a Runestone!';
+                }
+                return 'The pages crumble to dust as you read them.';
+            }
+        },
+        {
+            id: 'mysterious-stranger',
+            text: 'A cloaked figure approaches and gestures toward your buildings...',
+            buttonText: 'Accept Help',
+            buttonLabel: 'Accept the mysterious stranger\'s help for a production boost',
+            unlockCondition: () => buildings.some(b => b.owned >= 10),
+            action: () => {
+                if (Math.random() < 0.6) {
+                    const bonus = manaPerSecond * 60; // 60 seconds of production
+                    mana += bonus;
+                    if (typeof StatisticsModule !== 'undefined') StatisticsModule.addManaByBuildings(bonus);
+                    return `The stranger enchants your buildings! +${formatInteractiveNumber(bonus)} Mana.`;
+                } else {
+                    const loss = mana * 0.05;
+                    mana -= loss;
+                    return `The stranger was a trickster! Lost ${formatInteractiveNumber(loss)} Mana.`;
+                }
+            }
+        },
+        {
+            id: 'crystal-formation',
+            text: 'A rare crystal formation begins growing in your domain...',
+            buttonText: 'Harvest',
+            buttonLabel: 'Harvest the crystal formation for Mana',
+            unlockCondition: () => mana >= 10000,
+            action: () => {
+                const bonus = manaPerSecond * 45;
+                mana += bonus;
+                if (typeof StatisticsModule !== 'undefined') StatisticsModule.addManaByBuildings(bonus);
+                return `Beautiful crystals! +${formatInteractiveNumber(bonus)} Mana harvested.`;
+            }
+        },
+        {
+            id: 'spell-echo',
+            text: 'An echo of a powerful spell reverberates through the aether...',
+            buttonText: 'Absorb',
+            buttonLabel: 'Absorb the spell echo for Spell Power',
+            unlockCondition: () => (typeof SpellcastingModule !== 'undefined' && upgrades.find(u => u.id === 'spellcasting')?.isPurchased),
+            action: () => {
+                // This grants instant spell power, but we can't directly set it
+                // Instead, summon a positive runestone
+                if (typeof RunestonesModule !== 'undefined') {
+                    RunestonesModule.spawnRunestone();
+                    return 'The echo manifests as a Runestone!';
+                }
+                return 'The echo fades away.';
+            }
+        }
+    ];
+
+    function formatInteractiveNumber(num) {
+        if (typeof OptionsModule !== 'undefined' && OptionsModule.formatNumber) {
+            return OptionsModule.formatNumber(Math.floor(num));
+        }
+        return Math.floor(num).toString();
+    }
+
     let eventsLog = null;
     let timeoutId = null;
     const MAX_MESSAGES = 5;
@@ -93,12 +201,28 @@ const FlavorEventsModule = (function() {
         return getEventText(event);
     }
 
+    function getAvailableInteractiveEvents() {
+        return interactiveEvents.filter(event => {
+            if (event.unlockCondition) {
+                try { return event.unlockCondition(); } catch (e) { return false; }
+            }
+            return true;
+        });
+    }
+
     function showFlavorEvent() {
         if (!eventsLog) return;
 
+        // 25% chance of interactive event (if any are available)
+        const availableInteractive = getAvailableInteractiveEvents();
+        if (availableInteractive.length > 0 && Math.random() < 0.25) {
+            showInteractiveEvent(availableInteractive);
+            scheduleNextEvent();
+            return;
+        }
+
         const message = getRandomFlavorText();
         if (!message) {
-            // No available events, try again later
             scheduleNextEvent();
             return;
         }
@@ -126,6 +250,69 @@ const FlavorEventsModule = (function() {
 
         // Schedule next event
         scheduleNextEvent();
+    }
+
+    function showInteractiveEvent(available) {
+        if (!eventsLog) return;
+
+        const event = available[Math.floor(Math.random() * available.length)];
+
+        const eventElement = document.createElement('div');
+        eventElement.className = 'flavor-event interactive-event';
+        eventElement.setAttribute('role', 'region');
+        eventElement.setAttribute('aria-label', 'Interactive event');
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'interactive-event-text';
+        textSpan.textContent = event.text;
+
+        const actionBtn = document.createElement('button');
+        actionBtn.className = 'interactive-event-button';
+        actionBtn.textContent = event.buttonText;
+        actionBtn.setAttribute('aria-label', event.buttonLabel);
+
+        actionBtn.addEventListener('click', () => {
+            const result = event.action();
+            // Replace the event with the result
+            eventElement.innerHTML = '';
+            eventElement.className = 'flavor-event interactive-event-result';
+            const resultText = document.createElement('span');
+            resultText.textContent = result;
+            resultText.setAttribute('role', 'status');
+            resultText.setAttribute('aria-live', 'polite');
+            eventElement.appendChild(resultText);
+
+            // Fade out after 8 seconds
+            setTimeout(() => {
+                eventElement.style.opacity = '0';
+                eventElement.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    if (eventElement.parentNode) eventElement.remove();
+                }, 500);
+            }, 8000);
+        });
+
+        eventElement.appendChild(textSpan);
+        eventElement.appendChild(actionBtn);
+
+        // Insert at the top
+        eventsLog.prepend(eventElement);
+
+        // Auto-expire if not clicked after 30 seconds
+        setTimeout(() => {
+            if (eventElement.querySelector('.interactive-event-button')) {
+                eventElement.style.opacity = '0';
+                eventElement.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    if (eventElement.parentNode) eventElement.remove();
+                }, 500);
+            }
+        }, 30000);
+
+        // Remove oldest if over max
+        while (eventsLog.children.length > MAX_MESSAGES) {
+            eventsLog.removeChild(eventsLog.lastChild);
+        }
     }
 
     function scheduleNextEvent() {

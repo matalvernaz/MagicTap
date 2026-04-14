@@ -60,8 +60,91 @@ const PrestigeModule = (function() {
             isPurchased: false,
             unlockCost: 0,
             requiresUpgrade: 'mana-crystal-upgrade'
+        },
+        {
+            id: 'arcane-auto-gather',
+            name: 'Arcane Auto-Gather',
+            description: 'Automatically gathers Mana once per second (as if clicking).',
+            flavorText: 'Why click when magic can do it for you?',
+            cost: 15,
+            isAutoClicker: true,
+            isPurchased: false,
+            unlockCost: 0,
+            requiresUpgrade: 'spell-core'
+        },
+        {
+            id: 'head-start',
+            name: 'Head Start',
+            description: 'Start each run with 1,000 Mana.',
+            flavorText: 'A small gift from your past self.',
+            cost: 5,
+            startingMana: 1000,
+            isPurchased: false,
+            unlockCost: 0
+        },
+        {
+            id: 'greater-head-start',
+            name: 'Greater Head Start',
+            description: 'Start each run with 100,000 Mana.',
+            flavorText: 'A generous gift from your much wiser past self.',
+            cost: 20,
+            startingMana: 100000,
+            isPurchased: false,
+            unlockCost: 0,
+            requiresUpgrade: 'head-start'
+        },
+        {
+            id: 'runestone-affinity',
+            name: 'Runestone Affinity',
+            description: 'Runestones appear 30% more frequently.',
+            flavorText: 'The stones sense your presence and are drawn to you.',
+            cost: 8,
+            isRunestoneBoost: true,
+            isPurchased: false,
+            unlockCost: 0
+        },
+        {
+            id: 'spell-power-reservoir',
+            name: 'Spell Power Reservoir',
+            description: 'Spell Power regenerates 50% faster.',
+            flavorText: 'A deeper well of arcane energy to draw from.',
+            cost: 12,
+            isSpellRegenBoost: true,
+            isPurchased: false,
+            unlockCost: 0,
+            requiresUpgrade: 'mana-crystal-upgrade'
+        },
+        {
+            id: 'crystal-multiplication',
+            name: 'Crystal Multiplication',
+            description: 'Boosts MPS by 10%.',
+            flavorText: 'Your crystals resonate with accumulated power.',
+            cost: 25,
+            mpsBonus: 0.10,
+            isPurchased: false,
+            unlockCost: 0,
+            requiresUpgrade: 'spell-core'
+        },
+        {
+            id: 'hand-of-the-ancients',
+            name: 'Hand of the Ancients',
+            description: 'Start each run with 5 Wizard\'s Hands.',
+            flavorText: 'Spectral hands from past lives join your cause.',
+            cost: 10,
+            startingBuilding: { id: 'wizards-hand', count: 5 },
+            isPurchased: false,
+            unlockCost: 0
+        },
+        {
+            id: 'well-keeper',
+            name: 'Well Keeper',
+            description: 'Wishing Well coin generation doubled.',
+            flavorText: 'The well remembers your generosity.',
+            cost: 15,
+            isWellBoost: true,
+            isPurchased: false,
+            unlockCost: 0
         }
-        // Future prestige upgrades go here
     ];
 
     // Calculate Mana Crystals from total mana using Cookie Clicker formula
@@ -718,6 +801,26 @@ const PrestigeModule = (function() {
         prestigeUpgrades.forEach(u => u.isPurchased = false);
     }
 
+    function hasAutoClicker() {
+        const upgrade = prestigeUpgrades.find(u => u.id === 'arcane-auto-gather');
+        return upgrade && upgrade.isPurchased;
+    }
+
+    function hasRunestoneBoost() {
+        const upgrade = prestigeUpgrades.find(u => u.id === 'runestone-affinity');
+        return upgrade && upgrade.isPurchased;
+    }
+
+    function hasSpellRegenBoost() {
+        const upgrade = prestigeUpgrades.find(u => u.id === 'spell-power-reservoir');
+        return upgrade && upgrade.isPurchased;
+    }
+
+    function hasWellBoost() {
+        const upgrade = prestigeUpgrades.find(u => u.id === 'well-keeper');
+        return upgrade && upgrade.isPurchased;
+    }
+
     function getPrestigeUpgrades() {
         return prestigeUpgrades;
     }
@@ -745,6 +848,10 @@ const PrestigeModule = (function() {
         getPrestigeUpgrades,
         getStartingMana,
         getStartingBuildings,
+        hasAutoClicker,
+        hasRunestoneBoost,
+        hasSpellRegenBoost,
+        hasWellBoost,
         addPrestigePotential,
         getPrestigePotential,
         getHighestPotentialTier,

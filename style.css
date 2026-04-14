@@ -376,6 +376,50 @@ h2:focus {
     border-radius: 4px;
 }
 
+/* Interactive Events */
+.interactive-event {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    border-left-color: #ffd700;
+    background-color: #3a3a2a;
+    animation: slideIn 0.3s ease-out;
+}
+
+.interactive-event-text {
+    flex: 1;
+}
+
+.interactive-event-button {
+    flex-shrink: 0;
+    padding: 6px 16px;
+    font-size: 0.9em;
+    background-color: #ffd700;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    min-height: 36px;
+    transition: background-color 0.2s;
+}
+
+.interactive-event-button:hover {
+    background-color: #ffed4a;
+}
+
+.interactive-event-button:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.interactive-event-result {
+    border-left-color: #7cfc00;
+    background-color: #2a3a2a;
+    color: #7cfc00;
+}
+
 /* Game Panels (toggled via navigation) */
 .game-panel {
     margin-top: 20px;
@@ -477,6 +521,84 @@ h2:focus {
     #gather-mana-button {
         min-height: 60px;
     }
+}
+
+/* Floating Click Numbers */
+.floating-click-number {
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #7cfc00;
+    text-shadow: 0 0 6px rgba(124, 252, 0, 0.5);
+    animation: float-up 0.8s ease-out forwards;
+    z-index: 10;
+}
+
+@keyframes float-up {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-60px);
+    }
+}
+
+/* Bulk Buy Controls */
+.bulk-buy-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.bulk-buy-controls span {
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+.bulk-buy-btn {
+    padding: 5px 12px;
+    font-size: 0.85em;
+    background-color: #3a3a4a;
+    border: 1px solid #5a5a6a;
+    color: #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 44px;
+    min-height: 32px;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.bulk-buy-btn:hover {
+    background-color: #4a4a5a;
+}
+
+.bulk-buy-btn:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.bulk-buy-btn[aria-pressed="true"] {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Offline Progress Notification */
+.offline-progress-notification {
+    background-color: #2d4a2d;
+    border-color: #7cfc00;
+}
+
+.offline-progress-notification .notification-title {
+    color: #7cfc00;
 }
 
 /* Ranking Upgrades Panel */

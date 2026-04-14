@@ -144,6 +144,100 @@ const SaveManager = (function() {
         }
     }
 
+    function calculateOfflineProgress(saveData) {
+        if (!saveData || !saveData.timestamp) return null;
+
+        const now = Date.now();
+        const elapsed = (now - saveData.timestamp) / 1000; // seconds
+        const MIN_OFFLINE_SECONDS = 60; // At least 1 minute away
+        const MAX_OFFLINE_SECONDS = 8 * 60 * 60; // Cap at 8 hours
+
+        if (elapsed < MIN_OFFLINE_SECONDS) return null;
+
+        const cappedElapsed = Math.min(elapsed, MAX_OFFLINE_SECONDS);
+        const savedMPS = saveData.game ? saveData.game.manaPerSecond : 0;
+
+        if (savedMPS <= 0) return null;
+
+        // Apply prestige multiplier if available
+        let prestigeMultiplier = 1;
+        if (saveData.prestige && saveData.prestige.totalManaCrystalsEarned > 0) {
+            const rawBonus = saveData.prestige.totalManaCrystalsEarned / 100;
+            const potential = saveData.prestige.prestigePotentialUnlocked || 0;
+            prestigeMultiplier = 1 + (rawBonus * (potential / 100));
+        }
+
+        // Offline earns 50% of active rate (standard idle game convention)
+        const offlineRate = 0.5;
+        const earned = savedMPS * prestigeMultiplier * cappedElapsed * offlineRate;
+
+        return {
+            earned: earned,
+            elapsed: cappedElapsed,
+            wasCapped: elapsed > MAX_OFFLINE_SECONDS
+        };
+    }
+
+    function showOfflineProgressNotification(progress) {
+        const notificationArea = document.getElementById('notification-area');
+        if (!notificationArea) return;
+
+        // Screen reader announcement
+        const liveAnnouncement = document.createElement('span');
+        liveAnnouncement.className = 'sr-only';
+        liveAnnouncement.setAttribute('role', 'alert');
+        const formattedMana = typeof OptionsModule !== 'undefined' ? OptionsModule.formatNumber(Math.floor(progress.earned)) : Math.floor(progress.earned).toString();
+        liveAnnouncement.textContent = `Welcome back! You earned ${formattedMana} Mana while away.`;
+        notificationArea.appendChild(liveAnnouncement);
+        setTimeout(() => liveAnnouncement.remove(), 3000);
+
+        // Format elapsed time
+        const hours = Math.floor(progress.elapsed / 3600);
+        const minutes = Math.floor((progress.elapsed % 3600) / 60);
+        let timeStr = '';
+        if (hours > 0) timeStr += hours + 'h ';
+        if (minutes > 0) timeStr += minutes + 'm';
+        if (!timeStr) timeStr = 'a short while';
+
+        // Visible notification
+        const notification = document.createElement('div');
+        notification.className = 'notification offline-progress-notification';
+        notification.setAttribute('role', 'region');
+        notification.setAttribute('aria-label', 'Offline progress report');
+
+        const dismissBtn = document.createElement('button');
+        dismissBtn.className = 'notification-dismiss';
+        dismissBtn.setAttribute('aria-label', 'Dismiss offline progress notification');
+        dismissBtn.textContent = 'X';
+        dismissBtn.addEventListener('click', () => notification.remove());
+
+        const title = document.createElement('p');
+        title.className = 'notification-title';
+        title.textContent = 'Welcome Back!';
+
+        const content = document.createElement('p');
+        content.className = 'notification-content';
+        content.textContent = `You were away for ${timeStr.trim()}. Your wizards earned ${formattedMana} Mana while you were gone!`;
+        if (progress.wasCapped) {
+            const note = document.createElement('p');
+            note.className = 'notification-content';
+            note.style.fontSize = '0.9em';
+            note.style.marginTop = '5px';
+            note.textContent = '(Offline earnings capped at 8 hours)';
+            notification.appendChild(note);
+        }
+
+        notification.appendChild(dismissBtn);
+        notification.appendChild(title);
+        notification.appendChild(content);
+        notificationArea.appendChild(notification);
+
+        // Auto-dismiss after 15 seconds
+        setTimeout(() => {
+            if (notification.parentNode) notification.remove();
+        }, 15000);
+    }
+
     function load() {
         try {
             const saveString = localStorage.getItem(SAVE_KEY);
@@ -153,6 +247,10 @@ const SaveManager = (function() {
             }
 
             const saveData = JSON.parse(saveString);
+
+            // Calculate offline progress before applying save
+            const offlineProgress = calculateOfflineProgress(saveData);
+
             if (applySaveData(saveData)) {
                 // productionPerSecond is now saved with all boosts, no need to re-apply
                 // Recalculate MPS with loaded multiplier and building data
@@ -179,6 +277,18 @@ const SaveManager = (function() {
                 updateDisplay();
                 updateWishingWellButton();
                 updateRankingUpgradesButton();
+
+                // Apply offline progress
+                if (offlineProgress && offlineProgress.earned > 0) {
+                    mana += offlineProgress.earned;
+                    if (typeof StatisticsModule !== 'undefined') {
+                        StatisticsModule.addManaByBuildings(offlineProgress.earned);
+                    }
+                    updateDisplay();
+                    // Show notification after a brief delay to let the UI settle
+                    setTimeout(() => showOfflineProgressNotification(offlineProgress), 500);
+                }
+
                 console.log('Game loaded successfully');
                 return true;
             }

@@ -1,4 +1,4 @@
-const VERSION = '0.7';
+const VERSION = '0.8';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -22,6 +22,7 @@ let manaPerClickFromUpgrades = 0;
 let mpsFromUpgrades = 0;
 let mpsUpgradeMultiplier = 1; // Multiplier from upgrades that boost all MPS
 let proficiencyUpgradeCount = 0; // Count of kitten-style upgrades that scale with Magic Proficiency
+let bulkBuyAmount = 1; // 1, 10, 100, or -1 for max
 
 // --- Initialize Panels ---
 function initializePanels() {
@@ -1496,6 +1497,27 @@ function updateDisplay() {
     checkAffordability(); // Check affordability for both buildings and upgrades
 }
 
+// Function to show floating click number
+function showFloatingNumber(amount) {
+    const button = document.getElementById('gather-mana-button');
+    if (!button) return;
+
+    const floater = document.createElement('span');
+    floater.className = 'floating-click-number';
+    floater.setAttribute('aria-hidden', 'true'); // Decorative only
+    floater.textContent = '+' + OptionsModule.formatNumber(Math.floor(amount));
+
+    // Random horizontal offset for variety
+    const offsetX = (Math.random() - 0.5) * 60;
+    floater.style.left = `calc(50% + ${offsetX}px)`;
+
+    button.parentElement.style.position = 'relative';
+    button.parentElement.appendChild(floater);
+
+    // Remove after animation completes
+    floater.addEventListener('animationend', () => floater.remove());
+}
+
 // Function to gather mana when the button is clicked
 function gatherMana() {
     // Check if silenced - no mana from clicking
@@ -1514,12 +1536,69 @@ function gatherMana() {
     if (typeof SpellcastingModule !== 'undefined') {
         effectiveMPC *= SpellcastingModule.getMPCMultiplier();
     }
+    // Apply Wishing Well MPC multiplier (Click Frenzy)
+    if (typeof WishingWellModule !== 'undefined') {
+        effectiveMPC *= WishingWellModule.getMPCMultiplier();
+    }
     // Ensure MPC doesn't go below 1
     if (effectiveMPC < 1) effectiveMPC = 1;
 
     mana += effectiveMPC;
     StatisticsModule.addManaByClick(effectiveMPC);
+    showFloatingNumber(effectiveMPC);
     updateDisplay();
+}
+
+// --- Bulk Buy Logic ---
+// Calculate total cost to buy N of a building (geometric series with 1.15 ratio)
+function getBulkBuildingCost(building, count) {
+    let totalCost = 0;
+    let costMultiplier = 1;
+    if (typeof RunestonesModule !== 'undefined') {
+        costMultiplier *= RunestonesModule.getTempBuildingCostMultiplier();
+    }
+    if (typeof SpellcastingModule !== 'undefined') {
+        costMultiplier *= SpellcastingModule.getBuildingCostMultiplier();
+    }
+    for (let i = 0; i < count; i++) {
+        totalCost += building.baseCost * Math.pow(1.15, building.owned + i) * costMultiplier;
+    }
+    return totalCost;
+}
+
+// Calculate how many buildings can be bought with current mana
+function getMaxBuyable(building) {
+    let count = 0;
+    let totalCost = 0;
+    let costMultiplier = 1;
+    if (typeof RunestonesModule !== 'undefined') {
+        costMultiplier *= RunestonesModule.getTempBuildingCostMultiplier();
+    }
+    if (typeof SpellcastingModule !== 'undefined') {
+        costMultiplier *= SpellcastingModule.getBuildingCostMultiplier();
+    }
+    while (true) {
+        const nextCost = building.baseCost * Math.pow(1.15, building.owned + count) * costMultiplier;
+        if (totalCost + nextCost > mana) break;
+        totalCost += nextCost;
+        count++;
+        if (count > 10000) break; // Safety cap
+    }
+    return { count, totalCost };
+}
+
+function getEffectiveBulkAmount(building) {
+    if (bulkBuyAmount === -1) {
+        return getMaxBuyable(building).count;
+    }
+    return bulkBuyAmount;
+}
+
+function getEffectiveBulkCost(building) {
+    if (bulkBuyAmount === -1) {
+        return getMaxBuyable(building).totalCost;
+    }
+    return getBulkBuildingCost(building, bulkBuyAmount);
 }
 
 // --- Building Logic ---
@@ -1530,14 +1609,18 @@ function buyBuilding(buildingId) {
         return;
     }
 
-    const cost = getBuildingCurrentCost(building);
-    if (mana >= cost) {
-        mana -= cost;
-        building.owned++;
+    const amount = bulkBuyAmount === -1 ? getMaxBuyable(building).count : bulkBuyAmount;
+    if (amount <= 0) return;
+
+    const totalCost = bulkBuyAmount === -1 ? getMaxBuyable(building).totalCost : getBulkBuildingCost(building, amount);
+
+    if (mana >= totalCost) {
+        mana -= totalCost;
+        building.owned += amount;
         recalculateMPS();
-        StatisticsModule.addBuildingOwned();
+        for (let i = 0; i < amount; i++) StatisticsModule.addBuildingOwned();
         updateBuildingDisplay(building);
-        updateDisplay(); // Update main displays and affordability
+        updateDisplay();
 
         // Play building purchase sound
         if (typeof SoundModule !== 'undefined') {
@@ -1545,9 +1628,8 @@ function buyBuilding(buildingId) {
         }
 
         // Announce purchase for screen readers
-        announceToScreenReader('Purchased');
-    } else {
-        // Do nothing if cannot afford
+        const msg = amount > 1 ? `Purchased ${amount}` : 'Purchased';
+        announceToScreenReader(msg);
     }
 }
 
@@ -1578,7 +1660,9 @@ function updateBuildingDisplay(building) {
     if (!building.element) return;
 
     building.element.querySelector('.building-owned span').textContent = building.owned;
-    building.element.querySelector('.building-cost .cost-value').textContent = OptionsModule.formatNumber(Math.floor(getBuildingCurrentCost(building)));
+    const amount = getEffectiveBulkAmount(building);
+    const cost = amount > 0 ? getEffectiveBulkCost(building) : getBuildingCurrentCost(building);
+    building.element.querySelector('.building-cost .cost-value').textContent = OptionsModule.formatNumber(Math.floor(cost));
 }
 
 function renderBuildings() {
@@ -1704,11 +1788,18 @@ function checkAffordability() {
     buildings.forEach(building => {
         if (building.element) {
             const buyButton = building.element.querySelector('.buy-building-button');
-            const cost = getBuildingCurrentCost(building);
-            if (mana >= cost) {
+            const amount = getEffectiveBulkAmount(building);
+            const cost = amount > 0 ? getEffectiveBulkCost(building) : Infinity;
+            const bulkLabel = bulkBuyAmount === -1 ? (amount > 0 ? ` x${amount}` : '') : (bulkBuyAmount > 1 ? ` x${bulkBuyAmount}` : '');
+
+            // Update displayed cost
+            const costEl = building.element.querySelector('.building-cost .cost-value');
+            if (costEl) costEl.textContent = OptionsModule.formatNumber(Math.floor(cost));
+
+            if (amount > 0 && mana >= cost) {
                 buyButton.disabled = false;
-                buyButton.textContent = `${building.name}, Can Buy`;
-                buyButton.setAttribute('aria-label', `${building.name}, Can Buy`);
+                buyButton.textContent = `Buy${bulkLabel} ${building.name}`;
+                buyButton.setAttribute('aria-label', `Buy${bulkLabel} ${building.name}, costs ${OptionsModule.formatNumber(Math.floor(cost))} Mana`);
                 buyButton.classList.add('can-buy');
                 buyButton.classList.remove('cannot-buy');
             } else {
@@ -1716,8 +1807,8 @@ function checkAffordability() {
                 const timeUntil = getTimeUntilAffordable(cost);
                 const timeStr = formatTime(timeUntil);
                 const timerDisplay = timeStr ? `, ${timeStr}` : '';
-                buyButton.textContent = `${building.name}, Not Affordable${timerDisplay}`;
-                buyButton.setAttribute('aria-label', `${building.name}, Not Affordable${timerDisplay}`);
+                buyButton.textContent = `Buy${bulkLabel} ${building.name}, Not Affordable${timerDisplay}`;
+                buyButton.setAttribute('aria-label', `Buy${bulkLabel} ${building.name}, Not Affordable${timerDisplay}`);
                 buyButton.classList.add('cannot-buy');
                 buyButton.classList.remove('can-buy');
             }
@@ -1941,6 +2032,9 @@ function getEffectiveMPS() {
     return effectiveMPS;
 }
 
+// Auto-clicker tick counter (clicks once per second = every 10 game ticks)
+let autoClickerTick = 0;
+
 function gameLoop() {
     // Skip production if in prestige mode
     if (PrestigeModule.isPrestigeMode()) {
@@ -1955,6 +2049,22 @@ function gameLoop() {
         StatisticsModule.addManaByBuildings(manaFromBuildings);
     }
     StatisticsModule.setCurrentMana(mana);
+
+    // Auto-clicker from prestige upgrade (1 click per second)
+    if (PrestigeModule.hasAutoClicker && PrestigeModule.hasAutoClicker()) {
+        autoClickerTick++;
+        if (autoClickerTick >= 10) {
+            autoClickerTick = 0;
+            // Simulate a click without visual feedback
+            let autoMPC = manaPerClick;
+            if (typeof RunestonesModule !== 'undefined') autoMPC += RunestonesModule.getTempMPCBonus();
+            if (typeof SpellcastingModule !== 'undefined') autoMPC *= SpellcastingModule.getMPCMultiplier();
+            if (typeof WishingWellModule !== 'undefined') autoMPC *= WishingWellModule.getMPCMultiplier();
+            if (autoMPC < 1) autoMPC = 1;
+            mana += autoMPC;
+            StatisticsModule.addManaByClick(autoMPC);
+        }
+    }
 
     // Check achievements and unlocks
     AchievementsModule.checkAchievements(StatisticsModule.getStats());
@@ -1975,6 +2085,10 @@ function gameLoop() {
         // Apply Golden Eye spell multiplier
         if (typeof SpellcastingModule !== 'undefined') {
             coinRate *= SpellcastingModule.getWishingWellMultiplier();
+        }
+        // Apply Well Keeper prestige upgrade
+        if (PrestigeModule.hasWellBoost && PrestigeModule.hasWellBoost()) {
+            coinRate *= 2;
         }
         WishingWellModule.addCoins(coinRate / 10); // Divide by 10 since loop runs 10x per second
         WishingWellModule.updateDisplay();
@@ -2014,6 +2128,21 @@ function resetForPrestige() {
 
     // Apply prestige building boosts and recalculate
     PrestigeModule.applyAllPrestigeBuildingBoosts();
+
+    // Apply starting mana from prestige upgrades
+    const startingMana = PrestigeModule.getStartingMana();
+    if (startingMana > 0) mana = startingMana;
+
+    // Apply starting buildings from prestige upgrades
+    const startingBuildings = PrestigeModule.getStartingBuildings();
+    Object.entries(startingBuildings).forEach(([id, count]) => {
+        const building = buildings.find(b => b.id === id);
+        if (building) {
+            building.owned += count;
+            building.isUnlocked = true;
+        }
+    });
+
     recalculateMPS();
 
     // Reset upgrades (all upgrades reset each run)
@@ -2067,9 +2196,61 @@ function resetForPrestige() {
 
 setInterval(gameLoop, 100);
 
+// --- Bulk Buy UI ---
+function createBulkBuyControls() {
+    const buildingsHeading = document.getElementById('buildings-heading');
+    if (!buildingsHeading) return;
+
+    const controls = document.createElement('div');
+    controls.className = 'bulk-buy-controls';
+    controls.setAttribute('role', 'radiogroup');
+    controls.setAttribute('aria-label', 'Bulk buy amount');
+
+    const label = document.createElement('span');
+    label.textContent = 'Buy:';
+    label.id = 'bulk-buy-label';
+    controls.appendChild(label);
+
+    const amounts = [
+        { value: 1, text: 'x1' },
+        { value: 10, text: 'x10' },
+        { value: 100, text: 'x100' },
+        { value: -1, text: 'Max' }
+    ];
+
+    amounts.forEach(({ value, text }) => {
+        const btn = document.createElement('button');
+        btn.className = 'bulk-buy-btn';
+        btn.textContent = text;
+        btn.setAttribute('role', 'radio');
+        btn.setAttribute('aria-checked', value === bulkBuyAmount ? 'true' : 'false');
+        btn.setAttribute('aria-label', `Buy ${text === 'Max' ? 'maximum' : text} buildings at once`);
+        if (value === bulkBuyAmount) btn.setAttribute('aria-pressed', 'true');
+
+        btn.addEventListener('click', () => {
+            bulkBuyAmount = value;
+            // Update all button states
+            controls.querySelectorAll('.bulk-buy-btn').forEach(b => {
+                b.setAttribute('aria-checked', 'false');
+                b.setAttribute('aria-pressed', 'false');
+            });
+            btn.setAttribute('aria-checked', 'true');
+            btn.setAttribute('aria-pressed', 'true');
+            // Refresh building displays with new bulk costs
+            buildings.forEach(b => updateBuildingDisplay(b));
+            checkAffordability();
+        });
+
+        controls.appendChild(btn);
+    });
+
+    buildingsHeading.insertAdjacentElement('afterend', controls);
+}
+
 // Initial setup
 initializePanels();
 setupNavigation();
+createBulkBuyControls();
 updateDisplay();
 renderBuildings();
 renderUpgrades();

@@ -42,3 +42,15 @@ Fixed Runestone positioning and made them accessible buttons.
 Improved screen reader announcements (reduced spam, clearer notifications).
 Default volume now starts at 50%.
 Various bug fixes and accessibility improvements.
+V.0.8, 04-13-2026:
+Offline Progress - the game now calculates how much Mana you earned while away and grants it on return (50% rate, capped at 8 hours).
+Floating click numbers - visual "+X" feedback when gathering Mana.
+Bulk Buy - toggle between x1, x10, x100, or Max purchases for buildings.
+Expanded Wishing Well - 4 new effects (Coin Shower, Mana Vortex, Click Frenzy, Arcane Blessing) with backfire variants. Well can now level up for more max coins and new effects.
+Expanded Prestige Store - 8 new upgrades: Auto-Gather, Head Start, Greater Head Start, Runestone Affinity, Spell Power Reservoir, Crystal Multiplication, Hand of the Ancients, and Well Keeper.
+Interactive Events - flavor events now occasionally offer choices with risk/reward (merchants, surges, tomes, strangers, crystal formations).
+Prestige upgrades now properly grant starting Mana and starting buildings on new runs.
+Runestone spawn rate can now be boosted by prestige upgrade.
+Spell Power regeneration can now be boosted by prestige upgrade.
+Wishing Well coin generation can now be boosted by prestige upgrade.
+Accessibility maintained across all new features (ARIA labels, keyboard navigation, screen reader announcements).

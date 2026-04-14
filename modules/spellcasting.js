@@ -214,9 +214,13 @@ const SpellcastingModule = (function() {
 
     // Update spell timers (called every 100ms from game loop)
     function update(deltaSeconds) {
-        // Regenerate spell power
+        // Regenerate spell power (with optional prestige boost)
         if (spellPower < MAX_SPELL_POWER) {
-            spellPower = Math.min(MAX_SPELL_POWER, spellPower + SPELL_POWER_REGEN_RATE * deltaSeconds);
+            let regenRate = SPELL_POWER_REGEN_RATE;
+            if (typeof PrestigeModule !== 'undefined' && PrestigeModule.hasSpellRegenBoost && PrestigeModule.hasSpellRegenBoost()) {
+                regenRate *= 1.5;
+            }
+            spellPower = Math.min(MAX_SPELL_POWER, spellPower + regenRate * deltaSeconds);
         }
 
         // Update active spell durations
