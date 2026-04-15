@@ -2916,37 +2916,41 @@ function gameLoop() {
         }
     }
 
-    // Check achievements and unlocks
-    AchievementsModule.checkAchievements(StatisticsModule.getStats());
-    checkUnlocks();
+    // Throttle heavy checks to once per second (every 10 ticks) to reduce lag
+    if (!gameLoop._slowTick) gameLoop._slowTick = 0;
+    gameLoop._slowTick++;
+    if (gameLoop._slowTick >= 10) {
+        gameLoop._slowTick = 0;
 
-    // Update ranking upgrades button visibility (based on achievement count)
-    updateRankingUpgradesButton();
+        // Check achievements and unlocks (heavy — 201 conditions)
+        AchievementsModule.checkAchievements(StatisticsModule.getStats());
+        checkUnlocks();
 
-    // Update spellcasting button visibility (based on achievement count)
-    updateSpellcastingButton();
+        // Update button visibility
+        updateRankingUpgradesButton();
+        updateSpellcastingButton();
 
-    // Update challenges (progress check, timer)
-    if (typeof ChallengesModule !== 'undefined') {
-        ChallengesModule.update();
-        // Show challenges button once prestige is available
-        const challengesBtn = document.getElementById('challenges-button');
-        if (challengesBtn && PrestigeModule.shouldShowPrestige()) {
-            challengesBtn.style.display = '';
+        // Update challenges (progress check, timer)
+        if (typeof ChallengesModule !== 'undefined') {
+            ChallengesModule.update();
+            const challengesBtn = document.getElementById('challenges-button');
+            if (challengesBtn && PrestigeModule.shouldShowPrestige()) {
+                challengesBtn.style.display = '';
+            }
         }
-    }
 
-    // Update Transcendence (visibility + display)
-    if (typeof TranscendenceModule !== 'undefined') {
-        const transBtn = document.getElementById('transcendence-button-nav');
-        if (transBtn && TranscendenceModule.shouldShow()) {
-            transBtn.style.display = '';
+        // Update Transcendence
+        if (typeof TranscendenceModule !== 'undefined') {
+            const transBtn = document.getElementById('transcendence-button-nav');
+            if (transBtn && TranscendenceModule.shouldShow()) {
+                transBtn.style.display = '';
+            }
+            TranscendenceModule.updateDisplay();
         }
-        TranscendenceModule.updateDisplay();
-    }
 
-    // Update prestige display (for countdown timers)
-    PrestigeModule.updateDisplay();
+        // Update prestige display
+        PrestigeModule.updateDisplay();
+    }
 
     // Update Wishing Well (coin generation)
     if (typeof WishingWellModule !== 'undefined' && WishingWellModule.isWellUnlocked()) {

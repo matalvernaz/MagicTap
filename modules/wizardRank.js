@@ -38,11 +38,11 @@ const WizardRankModule = (function() {
         { name: 'Arch Magus', minAchievements: 168 },
         { name: 'Grand Magus', minAchievements: 173 },
         { name: 'Void Magus', minAchievements: 178 },
-        { name: 'Archmage', minAchievements: 183 },
-        { name: 'Arcane Weaver', minAchievements: 188 },
-        { name: 'Eldritch', minAchievements: 193 },
-        { name: 'Deity', minAchievements: 198 },
-        { name: 'Living Spell', minAchievements: 201 }
+        { name: 'Archmage', minAchievements: 180 },
+        { name: 'Arcane Weaver', minAchievements: 185 },
+        { name: 'Eldritch', minAchievements: 189 },
+        { name: 'Deity', minAchievements: 191 },
+        { name: 'Living Spell', minAchievements: 193 }
     ];
 
     // Calculate Magic Proficiency (4% per achievement)

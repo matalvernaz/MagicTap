@@ -903,15 +903,7 @@ const AchievementsModule = (function() {
     { id: 'mps-10b', name: 'Apocalypse', description: 'Reach 10 billion Mana per second.', condition: () => manaPerSecond >= 1e10, isEarned: false },
     { id: 'mps-100b', name: 'Armageddon', description: 'Reach 100 billion Mana per second.', condition: () => manaPerSecond >= 1e11, isEarned: false },
     { id: 'mps-1t', name: 'Singularity', description: 'Reach 1 trillion Mana per second.', condition: () => manaPerSecond >= 1e12, isEarned: false },
-    // === CLICK MILESTONES (mana earned by clicking) ===
-    { id: 'click-1k', name: 'Dedicated Tapper', description: 'Earn 1,000 Mana from clicking.', condition: (stats) => stats.manaByClick >= 1000, isEarned: false },
-    { id: 'click-10k', name: 'Enthusiastic Tapper', description: 'Earn 10,000 Mana from clicking.', condition: (stats) => stats.manaByClick >= 10000, isEarned: false },
-    { id: 'click-100k', name: 'Obsessive Tapper', description: 'Earn 100,000 Mana from clicking.', condition: (stats) => stats.manaByClick >= 100000, isEarned: false },
-    { id: 'click-1m', name: 'Mana Tapper', description: 'Earn 1 million Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e6, isEarned: false },
-    { id: 'click-10m', name: 'Tap Master', description: 'Earn 10 million Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e7, isEarned: false },
-    { id: 'click-100m', name: 'Tap Legend', description: 'Earn 100 million Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e8, isEarned: false },
-    { id: 'click-1b', name: 'Tap God', description: 'Earn 1 billion Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e9, isEarned: false },
-    { id: 'click-10b', name: 'Tap Transcendent', description: 'Earn 10 billion Mana from clicking.', condition: (stats) => stats.manaByClick >= 1e10, isEarned: false },
+    // Click milestones already exist in the original achievements (lines 253-344)
     // === UPGRADE MILESTONES ===
     { id: 'upgrades-10', name: 'Student', description: 'Purchase 10 upgrades.', condition: (stats) => stats.upgradesPurchased >= 10, isEarned: false },
     { id: 'upgrades-25', name: 'Scholar', description: 'Purchase 25 upgrades.', condition: (stats) => stats.upgradesPurchased >= 25, isEarned: false },
