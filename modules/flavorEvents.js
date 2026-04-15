@@ -111,7 +111,7 @@ const FlavorEventsModule = (function() {
                     if (typeof StatisticsModule !== 'undefined') StatisticsModule.addManaByBuildings(bonus);
                     return `The stranger enchants your buildings! +${formatInteractiveNumber(bonus)} Mana.`;
                 } else {
-                    const loss = mana * 0.05;
+                    const loss = Math.min(mana, manaPerSecond * 45); // 45 seconds of production
                     mana -= loss;
                     return `The stranger was a trickster! Lost ${formatInteractiveNumber(loss)} Mana.`;
                 }

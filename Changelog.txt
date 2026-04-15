@@ -94,3 +94,11 @@ Fixed Coin Shower exploit (rebalanced cost/reward).
 Fixed Fire Elemental cost blocking Lava Elemental familiar progression.
 Fixed runestone effect timer stuck at 1s remaining.
 Fixed active spell timer spamming screen reader.
+V.1.2, 04-14-2026:
+Balance pass on building cost/MPS curve:
+- Magus production 2 → 5 MPS (was obsoleted instantly by Ley Line; now bridges Eye → Ley cleanly).
+- Magic Library production 550K → 180K MPS (was strictly better than Mages' Guild per mana; now a modest efficiency gain rather than an obsoletion).
+- Magic Spire cost 17.5B → 40B (to preserve monotonic cost/MPS into the final tier).
+Smoothed prestige Potential tier costs:
+- Arcane Crystal (T4) 6B → 1B, Legion of the Weave (T5) 1T → 100B. Removes the 540×/167× cliffs between T3-T5 in favor of a consistent ~100× step through mid-game tiers.
+Fixed Mysterious Stranger flavor event penalty scaling (was 5% of current Mana; now 45 seconds of production). Previously turned net-negative whenever the player had more than ~30 minutes of Mana banked, punishing offline returns and savings.
