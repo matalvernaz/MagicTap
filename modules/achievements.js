@@ -903,7 +903,35 @@ const AchievementsModule = (function() {
     { id: 'mps-10b', name: 'Apocalypse', description: 'Reach 10 billion Mana per second.', condition: () => manaPerSecond >= 1e10, isEarned: false },
     { id: 'mps-100b', name: 'Armageddon', description: 'Reach 100 billion Mana per second.', condition: () => manaPerSecond >= 1e11, isEarned: false },
     { id: 'mps-1t', name: 'Singularity', description: 'Reach 1 trillion Mana per second.', condition: () => manaPerSecond >= 1e12, isEarned: false },
-    // Click milestones already exist in the original achievements (lines 253-344)
+    // === COLLECTION MILESTONES ===
+    { id: 'one-of-each', name: 'Diversified Portfolio', description: 'Own at least 1 of every building type.', condition: () => buildings.every(b => b.owned >= 1), isEarned: false },
+    { id: 'ten-of-each', name: 'Well-Rounded Wizard', description: 'Own at least 10 of every building type.', condition: () => buildings.every(b => b.owned >= 10), isEarned: false },
+    { id: 'twenty-five-of-each', name: 'Master Builder', description: 'Own at least 25 of every building type.', condition: () => buildings.every(b => b.owned >= 25), isEarned: false },
+    { id: 'fifty-of-each', name: 'Arcane Architect', description: 'Own at least 50 of every building type.', condition: () => buildings.every(b => b.owned >= 50), isEarned: false },
+    { id: 'hundred-of-each', name: 'Empire of Magic', description: 'Own at least 100 of every building type.', condition: () => buildings.every(b => b.owned >= 100), isEarned: false },
+    // === SPELL SCHOOL MILESTONES ===
+    { id: 'all-schools', name: 'Arcane Scholar', description: 'Purchase all 10 spell school upgrades.', condition: () => ['abjuration','conjuration','divination','evocation','enchantment','illusion','necromancy','summoning','transmutation','prestidigitation'].every(id => upgrades.find(u => u.id === id)?.isPurchased), isEarned: false },
+    { id: 'blood-ritualist', name: 'Blood Ritualist', description: 'Purchase both Blood Magic and Ritualist.', condition: () => upgrades.find(u => u.id === 'blood-magic')?.isPurchased && upgrades.find(u => u.id === 'ritualist')?.isPurchased, isEarned: false },
+    // === RANK MILESTONES ===
+    { id: 'rank-wizard', name: 'Officially A Wizard', description: 'Reach the rank of Wizard.', condition: () => typeof WizardRankModule !== 'undefined' && AchievementsModule.getEarnedCount() >= 54, isEarned: false },
+    { id: 'rank-magus', name: 'Magus Rank', description: 'Reach the rank of Magus.', condition: () => typeof WizardRankModule !== 'undefined' && AchievementsModule.getEarnedCount() >= 135, isEarned: false },
+    { id: 'rank-archmage', name: 'Archmage Rank', description: 'Reach the rank of Archmage.', condition: () => typeof WizardRankModule !== 'undefined' && AchievementsModule.getEarnedCount() >= 180, isEarned: false },
+    // === BUILDING AT 10 (later buildings that are harder to get) ===
+    { id: 'fountain-10', name: 'Oasis', description: 'Own 10 Mana Fountains.', condition: () => buildings.find(b => b.id === 'mana-fountain')?.owned >= 10, isEarned: false },
+    { id: 'church-10', name: 'Diocese', description: 'Own 10 Churches of Mana.', condition: () => buildings.find(b => b.id === 'church-of-mana')?.owned >= 10, isEarned: false },
+    { id: 'guild-10', name: 'Guild Network', description: 'Own 10 Mages\' Guilds.', condition: () => buildings.find(b => b.id === 'mages-guild')?.owned >= 10, isEarned: false },
+    { id: 'library-10', name: 'Library System', description: 'Own 10 Magic Libraries.', condition: () => buildings.find(b => b.id === 'magic-library')?.owned >= 10, isEarned: false },
+    { id: 'spire-10', name: 'Spire Network', description: 'Own 10 Magic Spires.', condition: () => buildings.find(b => b.id === 'magic-spire')?.owned >= 10, isEarned: false },
+    // === APPAREL MILESTONES ===
+    { id: 'fully-dressed', name: 'Fully Dressed', description: 'Purchase the Cape, Hat, Mantle, Staff, Broom, and Amulet.', condition: () => ['wizards-cape','wizards-hat','wizards-mantle','wizards-staff','witchs-broom','enchanted-amulet'].every(id => upgrades.find(u => u.id === id)?.isPurchased), isEarned: false },
+    // === WISHING WELL LEVEL MILESTONES ===
+    { id: 'well-level-2', name: 'Deeper Well', description: 'Reach Wishing Well level 2.', condition: () => typeof WishingWellModule !== 'undefined' && WishingWellModule.getLevel() >= 2, isEarned: false },
+    { id: 'well-level-3', name: 'Bottomless Well', description: 'Reach Wishing Well level 3.', condition: () => typeof WishingWellModule !== 'undefined' && WishingWellModule.getLevel() >= 3, isEarned: false },
+    { id: 'well-level-4', name: 'Abyssal Well', description: 'Reach Wishing Well level 4.', condition: () => typeof WishingWellModule !== 'undefined' && WishingWellModule.getLevel() >= 4, isEarned: false },
+    // === FUN / QUIRKY ===
+    { id: 'patience', name: 'Patience', description: 'Have over 1 billion Mana without ever prestiging.', condition: (stats) => stats.currentMana >= 1e9 && (typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() === 0), isEarned: false },
+    { id: 'speed-start', name: 'Speed Start', description: 'Own 10 buildings within your first 100 clicks.', condition: (stats) => stats.totalBuildingsOwned >= 10 && stats.manaByClick < 100000, isEarned: false },
+    { id: 'all-challenges', name: 'Challenge Master', description: 'Complete all 6 Ascension Challenges.', condition: () => typeof ChallengesModule !== 'undefined' && ChallengesModule.getSaveData().completedChallenges.length >= 6, isEarned: false },
     // === UPGRADE MILESTONES ===
     { id: 'upgrades-10', name: 'Student', description: 'Purchase 10 upgrades.', condition: (stats) => stats.upgradesPurchased >= 10, isEarned: false },
     { id: 'upgrades-25', name: 'Scholar', description: 'Purchase 25 upgrades.', condition: (stats) => stats.upgradesPurchased >= 25, isEarned: false },
