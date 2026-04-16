@@ -5,10 +5,13 @@ const ChangelogModule = (function() {
             version: '1.6',
             date: '04-16-26',
             summary: `Fixed Spells Cast statistic stuck at 0 — the counter was never incremented when casting spells.
-Screen reader users now hear the full spell description, cost, and duration when focused on Cast buttons (matches the Wishing Well pattern).
+Screen reader users now hear the full spell description and cost when focused on Cast buttons (matches the Wishing Well pattern).
 Pressing G to gather mana now plays the gather sound (previously silent, only mouse clicks played sound).
 Runestones play an activation sound when clicked.
-Wishing Well effects play a sound when triggered.`
+Wishing Well effects play a sound when triggered, and a close sound when they expire.
+Spells play a close sound when they expire.
+Fixed alt-tabbed tabs accruing little production: browsers throttle background tabs so heavily that the 5s delta cap was eating most of the elapsed time. Visibility-change now applies offline-style catch-up (same cap and rate as reload-time offline progress) when the tab returns.
+Prestige Store now shows prerequisite-gated upgrades as locked teasers so you can see what's coming in the chain, instead of hiding them until you buy the prereq.`
         },
         {
             version: '1.5',

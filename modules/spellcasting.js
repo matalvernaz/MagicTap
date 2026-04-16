@@ -261,6 +261,9 @@ const SpellcastingModule = (function() {
                 recalculateMPS();
             }
             renderActiveSpells();
+            if (typeof SoundModule !== 'undefined') {
+                SoundModule.play('menuClose');
+            }
         }
 
         // Always update the main screen spell timers

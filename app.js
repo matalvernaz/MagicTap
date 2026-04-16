@@ -3093,6 +3093,58 @@ function resetForPrestige() {
 
 setInterval(gameLoop, 100);
 
+// Tab-hidden catch-up: browsers throttle background tabs so setInterval fires far less
+// than 10x/sec. The 5-second delta cap inside gameLoop caps per-tick production, so users
+// alt-tabbing returned to find little progress. On visibilitychange, apply offline-style
+// catch-up for the time spent hidden, mirroring the reload-time offline progress logic.
+let tabHiddenAt = null;
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        tabHiddenAt = Date.now();
+    } else if (tabHiddenAt !== null) {
+        const hiddenSeconds = (Date.now() - tabHiddenAt) / 1000;
+        tabHiddenAt = null;
+        // Prevent the next gameLoop tick from double-counting the hidden period
+        lastTickTime = Date.now();
+        applyHiddenCatchup(hiddenSeconds);
+    }
+});
+
+function applyHiddenCatchup(seconds) {
+    if (seconds < 60) return; // ignore brief alt-tabs
+    if (PrestigeModule.isPrestigeMode()) return;
+
+    let maxHours = 8;
+    if (typeof TranscendenceModule !== 'undefined' && TranscendenceModule.getOfflineCapHours) {
+        const upgraded = TranscendenceModule.getOfflineCapHours();
+        if (upgraded) maxHours = upgraded;
+    }
+    const cappedSeconds = Math.min(seconds, maxHours * 3600);
+
+    let offlineRate = 0.5;
+    if (typeof TranscendenceModule !== 'undefined' && TranscendenceModule.getOfflineRate) {
+        const upgraded = TranscendenceModule.getOfflineRate();
+        if (upgraded) offlineRate = upgraded;
+    }
+
+    const effectiveMPS = getEffectiveMPS();
+    const earned = effectiveMPS * cappedSeconds * offlineRate;
+    if (earned <= 0) return;
+
+    mana += earned;
+    StatisticsModule.addManaByBuildings(earned);
+    StatisticsModule.setCurrentMana(mana);
+    updateDisplay();
+
+    if (typeof showGameNotification === 'function') {
+        const mins = Math.floor(cappedSeconds / 60);
+        const hrs = Math.floor(mins / 60);
+        const timeStr = hrs > 0 ? `${hrs}h ${mins % 60}m` : `${mins}m`;
+        const amountStr = typeof OptionsModule !== 'undefined' ? OptionsModule.formatNumber(Math.floor(earned)) : Math.floor(earned).toString();
+        showGameNotification(`Welcome back! Earned ${amountStr} Mana while the tab was hidden (${timeStr}).`, 'success');
+    }
+}
+
 function createBulkBuyControls() {
     const buildingsHeading = document.getElementById('buildings-heading');
     if (!buildingsHeading) return;

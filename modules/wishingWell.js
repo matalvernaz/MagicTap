@@ -352,6 +352,10 @@ const WishingWellModule = (function() {
         updateActiveEffectDisplay();
         renderEffects(); // Update button states
 
+        if (typeof SoundModule !== 'undefined') {
+            SoundModule.play('menuClose');
+        }
+
         if (typeof showGameNotification === 'function') {
             showGameNotification('Wishing Well effect has ended.', wasNegative ? 'success' : 'info');
         }

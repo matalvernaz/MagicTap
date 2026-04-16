@@ -264,6 +264,15 @@
     opacity: 0.8;
 }
 
+.prestige-upgrade-item.locked {
+    border-left-color: #666;
+    opacity: 0.6;
+}
+
+.prestige-upgrade-item.locked .prestige-upgrade-name {
+    color: #aaa;
+}
+
 .prestige-upgrade-name {
     font-size: 1.2em;
     color: #9b59b6;

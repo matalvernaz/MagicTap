@@ -325,17 +325,19 @@ const PrestigeModule = (function() {
     }
 
     function getVisibleUpgrades() {
-        // Show upgrades based on total crystals earned and required upgrades
+        // Show upgrades based on total crystals earned. Prerequisite-gated upgrades are
+        // still returned (as locked teasers) so the player can see what's coming;
+        // renderPrestigeUpgrades marks them non-purchasable.
         return prestigeUpgrades.filter(upgrade => {
-            // Check crystal threshold
             if (totalManaCrystalsEarned < upgrade.unlockCost) return false;
-            // Check if requires another upgrade to be purchased
-            if (upgrade.requiresUpgrade) {
-                const requiredUpgrade = prestigeUpgrades.find(u => u.id === upgrade.requiresUpgrade);
-                if (!requiredUpgrade || !requiredUpgrade.isPurchased) return false;
-            }
             return true;
         });
+    }
+
+    function isPrerequisiteMet(upgrade) {
+        if (!upgrade.requiresUpgrade) return true;
+        const requiredUpgrade = prestigeUpgrades.find(u => u.id === upgrade.requiresUpgrade);
+        return !!(requiredUpgrade && requiredUpgrade.isPurchased);
     }
 
     function renderPrestigeUpgrades() {
@@ -362,6 +364,16 @@ const PrestigeModule = (function() {
                     <p class="prestige-upgrade-name">${upgrade.name} (Owned)</p>
                     <p class="prestige-upgrade-description">${upgrade.description}</p>
                     <p class="prestige-upgrade-flavor">${upgrade.flavorText}</p>
+                `;
+            } else if (!isPrerequisiteMet(upgrade)) {
+                const requiredUpgrade = prestigeUpgrades.find(u => u.id === upgrade.requiresUpgrade);
+                const requiredName = requiredUpgrade ? requiredUpgrade.name : upgrade.requiresUpgrade;
+                upgradeDiv.classList.add('locked');
+                upgradeDiv.innerHTML = `
+                    <p class="prestige-upgrade-name">${upgrade.name} (Locked)</p>
+                    <p class="prestige-upgrade-description">${upgrade.description}</p>
+                    <p class="prestige-upgrade-flavor">${upgrade.flavorText}</p>
+                    <p class="prestige-upgrade-cost">Requires: ${requiredName}</p>
                 `;
             } else {
                 const canAfford = manaCrystals >= upgrade.cost;
