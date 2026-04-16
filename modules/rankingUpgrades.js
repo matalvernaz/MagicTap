@@ -283,9 +283,21 @@ const RankingUpgradesModule = (function() {
     // Lightweight affordability refresh — called from the game loop so the
     // Buy buttons enable the moment the player accrues enough Mana, without
     // having to close and reopen the panel. Doesn't rebuild DOM.
+    // Also detects when new achievements unlock new items and triggers a full
+    // re-render so the player doesn't have to leave and re-enter the panel.
+    let _lastKnownAchCount = -1;
     function refreshAffordability() {
         const panel = document.getElementById('ranking-upgrades-panel');
         if (!panel || panel.hidden) return;
+
+        // If achievement count changed, new items may have unlocked — full re-render
+        const achCount = getAchievementCount();
+        if (achCount !== _lastKnownAchCount) {
+            _lastKnownAchCount = achCount;
+            renderUpgrades();
+            return;
+        }
+
         const buttons = panel.querySelectorAll('.buy-ranking-upgrade-btn');
         buttons.forEach(btn => {
             const category = btn.dataset.category;

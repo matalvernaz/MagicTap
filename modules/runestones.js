@@ -509,6 +509,9 @@ const RunestonesModule = (function() {
     }
 
     function announceToScreenReader(message) {
+        // Respect the "Enable Notifications" option
+        if (typeof OptionsModule !== 'undefined' && !OptionsModule.getOptions().notificationsEnabled) return;
+
         const container = document.getElementById('runestone-container');
         if (!container) return;
 

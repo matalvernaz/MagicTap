@@ -153,7 +153,17 @@ const SaveManager = (function() {
     function save() {
         try {
             const saveData = getSaveData();
-            localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+            const json = JSON.stringify(saveData);
+
+            // Validate the JSON round-trips before committing
+            JSON.parse(json);
+
+            // Write to a staging key first, then promote — if the tab
+            // closes mid-write the previous good save is still in SAVE_KEY.
+            localStorage.setItem(SAVE_KEY + '_staging', json);
+            localStorage.setItem(SAVE_KEY, json);
+            localStorage.removeItem(SAVE_KEY + '_staging');
+
             console.log('Game saved successfully');
             return true;
         } catch (e) {
@@ -268,7 +278,23 @@ const SaveManager = (function() {
 
     function load() {
         try {
-            const saveString = localStorage.getItem(SAVE_KEY);
+            let saveString = localStorage.getItem(SAVE_KEY);
+
+            // If a staging key exists, the previous save was interrupted —
+            // use whichever parses successfully, preferring staging (newer).
+            const stagingString = localStorage.getItem(SAVE_KEY + '_staging');
+            if (stagingString) {
+                try {
+                    JSON.parse(stagingString);
+                    saveString = stagingString;
+                    localStorage.setItem(SAVE_KEY, stagingString);
+                    console.log('Recovered save from staging key');
+                } catch (e) {
+                    console.warn('Staging save was corrupt, using main save');
+                }
+                localStorage.removeItem(SAVE_KEY + '_staging');
+            }
+
             if (!saveString) {
                 console.log('No save data found');
                 return false;
@@ -384,8 +410,9 @@ const SaveManager = (function() {
         // Stop auto-save to prevent saving during reset
         stopAutoSave();
 
-        // Clear the save data from localStorage
+        // Clear the save data from localStorage (including any in-flight staging key)
         localStorage.removeItem(SAVE_KEY);
+        localStorage.removeItem(SAVE_KEY + '_staging');
 
         // Also clear tutorial completion
         localStorage.removeItem('magictap_tutorial_complete');

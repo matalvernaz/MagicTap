@@ -1,4 +1,4 @@
-const VERSION = '1.4';
+const VERSION = '1.5';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -2867,30 +2867,40 @@ function autoBuyCheapest() {
     }
 }
 
-// Tick counters for prestige auto-features
-let autoClickerTick = 0;
-let autoBuyTick = 0;
+// Delta-time tracking for accurate production in background tabs
+// (browsers throttle setInterval to ~1s when the tab is hidden)
+let lastTickTime = Date.now();
+let autoClickerAccum = 0;  // seconds accumulated for auto-clicker (fires every 1s)
+let autoBuyAccum = 0;       // seconds accumulated for auto-buy (fires every 3s)
+let slowTickAccum = 0;      // seconds accumulated for heavy checks (fires every 1s)
 
 function gameLoop() {
+    const now = Date.now();
+    // Cap delta at 5s to avoid mega-jumps if the tab was suspended for a long time
+    // (long absences are handled by offline progress on reload instead).
+    // Clamp to 0 to guard against system clock adjustments going backwards.
+    const deltaSeconds = Math.max(0, Math.min((now - lastTickTime) / 1000, 5));
+    lastTickTime = now;
+
     // Skip production if in prestige mode
     if (PrestigeModule.isPrestigeMode()) {
         return;
     }
 
-    // Apply prestige multiplier to production
+    // Apply prestige multiplier to production (delta-time based)
     const effectiveMPS = getEffectiveMPS();
-    const manaFromBuildings = effectiveMPS / 10;
+    const manaFromBuildings = effectiveMPS * deltaSeconds;
     mana += manaFromBuildings;
     if (manaFromBuildings > 0) {
         StatisticsModule.addManaByBuildings(manaFromBuildings);
     }
     StatisticsModule.setCurrentMana(mana);
 
-    // Auto-clicker from prestige upgrade (1 click per second = every 10 ticks)
+    // Auto-clicker from prestige upgrade (1 click per second)
     if (PrestigeModule.hasAutoClicker && PrestigeModule.hasAutoClicker()) {
-        autoClickerTick++;
-        if (autoClickerTick >= 10) {
-            autoClickerTick = 0;
+        autoClickerAccum += deltaSeconds;
+        while (autoClickerAccum >= 1) {
+            autoClickerAccum -= 1;
             let autoMPC = manaPerClick;
             if (typeof RunestonesModule !== 'undefined') autoMPC += RunestonesModule.getTempMPCBonus();
             if (typeof SpellcastingModule !== 'undefined') autoMPC *= SpellcastingModule.getMPCMultiplier();
@@ -2905,20 +2915,19 @@ function gameLoop() {
         }
     }
 
-    // Auto-buy from prestige upgrade (every 3 seconds = every 30 ticks)
+    // Auto-buy from prestige upgrade (every 3 seconds)
     if (PrestigeModule.hasAutoBuy && PrestigeModule.hasAutoBuy()) {
-        autoBuyTick++;
-        if (autoBuyTick >= 30) {
-            autoBuyTick = 0;
+        autoBuyAccum += deltaSeconds;
+        while (autoBuyAccum >= 3) {
+            autoBuyAccum -= 3;
             autoBuyCheapest();
         }
     }
 
-    // Throttle heavy checks to once per second (every 10 ticks) to reduce lag
-    if (!gameLoop._slowTick) gameLoop._slowTick = 0;
-    gameLoop._slowTick++;
-    if (gameLoop._slowTick >= 10) {
-        gameLoop._slowTick = 0;
+    // Throttle heavy checks to once per second
+    slowTickAccum += deltaSeconds;
+    if (slowTickAccum >= 1) {
+        slowTickAccum -= 1;
 
         // Check achievements and unlocks (heavy — 201 conditions)
         AchievementsModule.checkAchievements(StatisticsModule.getStats());
@@ -2949,15 +2958,13 @@ function gameLoop() {
         // Update prestige display
         PrestigeModule.updateDisplay();
 
-        // Refresh Ranking Upgrades affordability if the panel is open —
-        // otherwise buy buttons stay disabled until the player closes and
-        // reopens the panel (forum report from musicman).
+        // Refresh Ranking Upgrades affordability if the panel is open
         if (typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.refreshAffordability) {
             RankingUpgradesModule.refreshAffordability();
         }
     }
 
-    // Update Wishing Well (coin generation)
+    // Update Wishing Well (coin generation, delta-time based)
     if (typeof WishingWellModule !== 'undefined' && WishingWellModule.isWellUnlocked()) {
         let coinRate = WishingWellModule.getCoinGenerationRate();
         // Apply Golden Eye spell multiplier
@@ -2968,13 +2975,13 @@ function gameLoop() {
         if (typeof PrestigeModule !== 'undefined' && PrestigeModule.hasWellBoost && PrestigeModule.hasWellBoost()) {
             coinRate *= 2;
         }
-        WishingWellModule.addCoins(coinRate / 10); // Divide by 10 since loop runs 10x per second
+        WishingWellModule.addCoins(coinRate * deltaSeconds);
         WishingWellModule.updateDisplay();
     }
 
     // Update Spellcasting (spell power regen, active spell timers)
     if (typeof SpellcastingModule !== 'undefined') {
-        SpellcastingModule.update(0.1); // 0.1 seconds per tick
+        SpellcastingModule.update(deltaSeconds);
         SpellcastingModule.updateDisplay();
     }
 
@@ -3246,6 +3253,9 @@ document.title = 'MagicTap, V.' + VERSION;
 // Simple announcement helper for screen readers
 // Clears previous announcements so rapid actions only announce once
 function announceToScreenReader(message) {
+    // Respect the "Enable Notifications" option
+    if (typeof OptionsModule !== 'undefined' && !OptionsModule.getOptions().notificationsEnabled) return;
+
     const notificationArea = document.getElementById('notification-area');
     if (!notificationArea) return;
 

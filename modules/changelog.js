@@ -2,6 +2,15 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '1.5',
+            date: '04-16-26',
+            summary: `Fixed challenges activating without prestige — challenges now require at least one prestige before they can be started. Existing saves with exploited challenges are cleaned up on load.
+Fixed ranking upgrades not refreshing when new achievements are earned while the panel is open — new items now appear immediately.
+Fixed notification suppression not working for screen reader announcements — all aria-live writes (achievements, runestones, purchases, challenges) now respect the Enable Notifications toggle.
+Fixed background tab losing production — game loop now uses delta-time so mana accrual is accurate even when the browser throttles background tabs. Also guards against system clock adjustments.
+Improved save reliability — saves now use a staging key so a tab close mid-write can't corrupt the save file.`
+        },
+        {
             version: '1.4',
             date: '04-15-26',
             summary: `Ranking Upgrades rebalanced across wizard ranks: familiars gated in 13 tiers, enchantments and wizardries individually gated. 32 of 40 ranks now unlock new items (was 5). Rank-locked teasers show what's coming and how many achievements you need.

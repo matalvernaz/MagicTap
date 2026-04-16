@@ -120,13 +120,20 @@ const ChallengesModule = (function() {
 
         container.innerHTML = '';
 
+        const hasPrestiged = typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() > 0;
+        if (!hasPrestiged) {
+            container.innerHTML = '<p class="locked-message">You must prestige at least once before activating challenges.</p>';
+            return;
+        }
+
         challenges.forEach(challenge => {
             const div = document.createElement('div');
             div.className = 'challenge-item' + (challenge.isCompleted ? ' completed' : '');
             div.setAttribute('role', 'listitem');
 
             const isActive = activeChallenge && activeChallenge.id === challenge.id;
-            const canStart = !activeChallenge && !challenge.isCompleted;
+            const hasPrestiged = typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() > 0;
+            const canStart = !activeChallenge && !challenge.isCompleted && hasPrestiged;
 
             div.innerHTML = `
                 <div class="challenge-header">
@@ -158,19 +165,24 @@ const ChallengesModule = (function() {
         const challenge = challenges.find(c => c.id === challengeId);
         if (!challenge || challenge.isCompleted || activeChallenge) return;
 
+        // Challenges require at least one prestige to activate
+        if (typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() < 1) return;
+
         activeChallenge = challenge;
         challengeStartTime = Date.now();
         challengeElapsed = 0;
 
-        // Announce to screen reader
-        const notificationArea = document.getElementById('notification-area');
-        if (notificationArea) {
-            const announcement = document.createElement('span');
-            announcement.className = 'sr-only';
-            // notification-area has aria-live, no role="alert" needed
-            announcement.textContent = `Challenge started: ${challenge.name}. ${challenge.restriction}`;
-            notificationArea.appendChild(announcement);
-            setTimeout(() => announcement.remove(), 3000);
+        // Announce to screen reader (respect notification suppression)
+        const notificationsOn = typeof OptionsModule === 'undefined' || OptionsModule.getOptions().notificationsEnabled;
+        if (notificationsOn) {
+            const notificationArea = document.getElementById('notification-area');
+            if (notificationArea) {
+                const announcement = document.createElement('span');
+                announcement.className = 'sr-only';
+                announcement.textContent = `Challenge started: ${challenge.name}. ${challenge.restriction}`;
+                notificationArea.appendChild(announcement);
+                setTimeout(() => announcement.remove(), 3000);
+            }
         }
 
         // Apply restrictions
@@ -198,15 +210,17 @@ const ChallengesModule = (function() {
         renderChallenges();
         updateActiveDisplay();
 
-        // Announce
-        const notificationArea = document.getElementById('notification-area');
-        if (notificationArea) {
-            const announcement = document.createElement('span');
-            announcement.className = 'sr-only';
-            // notification-area has aria-live, no role="alert" needed
-            announcement.textContent = `Challenge abandoned: ${name}.`;
-            notificationArea.appendChild(announcement);
-            setTimeout(() => announcement.remove(), 3000);
+        // Announce (respect notification suppression)
+        const notificationsOn = typeof OptionsModule === 'undefined' || OptionsModule.getOptions().notificationsEnabled;
+        if (notificationsOn) {
+            const notificationArea = document.getElementById('notification-area');
+            if (notificationArea) {
+                const announcement = document.createElement('span');
+                announcement.className = 'sr-only';
+                announcement.textContent = `Challenge abandoned: ${name}.`;
+                notificationArea.appendChild(announcement);
+                setTimeout(() => announcement.remove(), 3000);
+            }
         }
     }
 
@@ -226,45 +240,41 @@ const ChallengesModule = (function() {
         renderChallenges();
         updateActiveDisplay();
 
-        // Show completion notification
+        // Show completion notification (all announcements respect notification suppression)
+        const notificationsOn = typeof OptionsModule === 'undefined' || OptionsModule.getOptions().notificationsEnabled;
         const notificationArea = document.getElementById('notification-area');
-        if (notificationArea) {
+        if (notificationArea && notificationsOn) {
             const announcement = document.createElement('span');
             announcement.className = 'sr-only';
-            // notification-area has aria-live, no role="alert" needed
             announcement.textContent = `Challenge completed: ${name}! Reward: ${reward}`;
             notificationArea.appendChild(announcement);
             setTimeout(() => announcement.remove(), 3000);
 
-            // Visible notification — gated by the Enable Notifications option.
-            const notificationsOn = typeof OptionsModule === 'undefined' || OptionsModule.getOptions().notificationsEnabled;
-            if (notificationsOn) {
-                const notification = document.createElement('div');
-                notification.className = 'notification challenge-complete-notification';
-                notification.setAttribute('role', 'region');
-                notification.setAttribute('aria-label', 'Challenge completed');
+            const notification = document.createElement('div');
+            notification.className = 'notification challenge-complete-notification';
+            notification.setAttribute('role', 'region');
+            notification.setAttribute('aria-label', 'Challenge completed');
 
-                const dismissBtn = document.createElement('button');
-                dismissBtn.className = 'notification-dismiss';
-                dismissBtn.setAttribute('aria-label', 'Dismiss');
-                dismissBtn.textContent = 'X';
-                dismissBtn.addEventListener('click', () => notification.remove());
+            const dismissBtn = document.createElement('button');
+            dismissBtn.className = 'notification-dismiss';
+            dismissBtn.setAttribute('aria-label', 'Dismiss');
+            dismissBtn.textContent = 'X';
+            dismissBtn.addEventListener('click', () => notification.remove());
 
-                const title = document.createElement('p');
-                title.className = 'notification-title';
-                title.textContent = 'Challenge Completed!';
+            const title = document.createElement('p');
+            title.className = 'notification-title';
+            title.textContent = 'Challenge Completed!';
 
-                const content = document.createElement('p');
-                content.className = 'notification-content';
-                content.textContent = `${name} — ${reward}`;
+            const content = document.createElement('p');
+            content.className = 'notification-content';
+            content.textContent = `${name} — ${reward}`;
 
-                notification.appendChild(dismissBtn);
-                notification.appendChild(title);
-                notification.appendChild(content);
-                notificationArea.appendChild(notification);
+            notification.appendChild(dismissBtn);
+            notification.appendChild(title);
+            notification.appendChild(content);
+            notificationArea.appendChild(notification);
 
-                setTimeout(() => { if (notification.parentNode) notification.remove(); }, 20000);
-            }
+            setTimeout(() => { if (notification.parentNode) notification.remove(); }, 20000);
         }
 
         // Save
@@ -418,7 +428,10 @@ const ChallengesModule = (function() {
         }
         if (data.activeChallenge) {
             const c = challenges.find(ch => ch.id === data.activeChallenge);
-            if (c && !c.isCompleted) {
+            // Only restore if the player has actually prestiged (guards against
+            // saves from before the prestige gate was added)
+            const hasPrestiged = typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() > 0;
+            if (c && !c.isCompleted && hasPrestiged) {
                 activeChallenge = c;
                 challengeStartTime = data.challengeStartTime || Date.now();
             }
