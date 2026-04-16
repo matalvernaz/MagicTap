@@ -109,3 +109,11 @@ Fixed Options "Enable Notifications" toggle being ignored: the flag was stored b
 Fixed Ranking Upgrades buy buttons staying disabled until panel reopen: added live affordability refresh in the game loop.
 Fixed screen-reader users not hearing time-until-affordable for buildings: aria-label now includes the countdown, matching the visible button text.
 Fixed building descriptions containing hard-coded base production numbers that went stale after buying upgrades; replaced with thematic descriptions (the dynamic "Each: X MPS" line below already shows live production).
+V.1.4, 04-15-2026:
+Ranking Upgrades rebalance — items now spread across wizard ranks:
+- Familiars (53) gated in 13 tiers from Novice through Deity. Each rank-up reveals new familiars to purchase.
+- Enchantments (15) gated individually from Journeyman through Deity.
+- Wizardries (8) gated from Initiate through Eldritch.
+- 32 of 40 ranks now unlock ranking upgrades (was only 5). Previously all 76 items were available the moment you hit rank 3.
+- Rank-locked items show a teaser with the required rank name and how many achievements remain.
+16 new achievements (231 total) for ranking upgrade milestones: familiar ownership (1/5/10/20/30/40/all), enchantments (1/5/10/all), wizardries (1/4/all), and combined totals (25/all).

@@ -999,6 +999,26 @@ const AchievementsModule = (function() {
     { id: 'mpc-10k', name: 'Mighty Tap', description: 'Reach 10,000 Mana per click.', condition: () => manaPerClick >= 10000, isEarned: false },
     { id: 'mpc-100k', name: 'Devastating Tap', description: 'Reach 100,000 Mana per click.', condition: () => manaPerClick >= 100000, isEarned: false },
     { id: 'mpc-1m', name: 'World-Shaking Tap', description: 'Reach 1 million Mana per click.', condition: () => manaPerClick >= 1e6, isEarned: false },
+    // === RANKING UPGRADES — Familiars ===
+    { id: 'familiar-1', name: 'First Friend', description: 'Purchase your first familiar.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('familiars') >= 1, isEarned: false },
+    { id: 'familiar-5', name: 'Pack Leader', description: 'Purchase 5 familiars.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('familiars') >= 5, isEarned: false },
+    { id: 'familiar-10', name: 'Menagerie', description: 'Purchase 10 familiars.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('familiars') >= 10, isEarned: false },
+    { id: 'familiar-20', name: 'Beast Master', description: 'Purchase 20 familiars.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('familiars') >= 20, isEarned: false },
+    { id: 'familiar-30', name: 'Familiar Army', description: 'Purchase 30 familiars.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('familiars') >= 30, isEarned: false },
+    { id: 'familiar-40', name: 'Legion of Companions', description: 'Purchase 40 familiars.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('familiars') >= 40, isEarned: false },
+    { id: 'familiar-all', name: 'Familiar Collector', description: 'Purchase all 53 familiars.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('familiars') >= 53, isEarned: false },
+    // === RANKING UPGRADES — Enchantments ===
+    { id: 'enchant-ach-1', name: 'First Enchantment', description: 'Purchase your first enchantment.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('enchantments') >= 1, isEarned: false },
+    { id: 'enchant-ach-5', name: 'Enchanting Progress', description: 'Purchase 5 enchantments.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('enchantments') >= 5, isEarned: false },
+    { id: 'enchant-ach-10', name: 'Master Enchanter', description: 'Purchase 10 enchantments.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('enchantments') >= 10, isEarned: false },
+    { id: 'enchant-ach-all', name: 'Enchantment Complete', description: 'Purchase all 15 enchantments.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('enchantments') >= 15, isEarned: false },
+    // === RANKING UPGRADES — Wizardries ===
+    { id: 'wizardry-ach-1', name: 'First Wizardry', description: 'Purchase your first wizardry.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('wizardries') >= 1, isEarned: false },
+    { id: 'wizardry-ach-4', name: 'Half Wizard', description: 'Purchase 4 wizardries.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('wizardries') >= 4, isEarned: false },
+    { id: 'wizardry-ach-all', name: 'Grand Wizardry', description: 'Purchase all 8 wizardries.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getPurchasedCount('wizardries') >= 8, isEarned: false },
+    // === RANKING UPGRADES — Combined ===
+    { id: 'ranking-25', name: 'Collector', description: 'Purchase 25 ranking upgrades total.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getTotalPurchasedCount() >= 25, isEarned: false },
+    { id: 'ranking-all', name: 'Master of All', description: 'Purchase all 76 ranking upgrades.', condition: () => typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.getTotalPurchasedCount() >= 76, isEarned: false },
     ];
 
 

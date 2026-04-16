@@ -1,15 +1,73 @@
 // Ranking Upgrades Module - Familiars, Enchantments, Wizardries
 const RankingUpgradesModule = (function() {
-    // Achievement thresholds for category unlocks
-    const RANK_THRESHOLDS = {
-        WIZARDRIES: 3,     // Rank 2 (Initiate)
-        FAMILIARS: 7,      // Rank 3 (Novice)
-        ENCHANTMENTS: 18   // Rank 5 (Journeyman)
-    };
+    // Per-item achievement thresholds. Each tier gate requires the player to
+    // have earned at least N achievements (i.e. reached a certain wizard rank)
+    // before items in that tier become visible. This spreads ranking upgrades
+    // across the full rank progression instead of front-loading them all.
+
+    // Familiars (53 items) — batches of 2-5, 13 tiers
+    const FAMILIAR_THRESHOLDS = [
+        7, 7, 7, 7, 7,             // 0-4:   Novice
+        12, 12, 12,                 // 5-7:   Apprentice
+        24, 24, 24, 24, 24,        // 8-12:  Adept
+        36, 36, 36, 36, 36,        // 13-17: Witch
+        60, 60, 60, 60, 60,        // 18-22: Magician
+        90, 90, 90, 90, 90,        // 23-27: Ritualist
+        110, 110, 110,             // 28-30: Transmuter
+        130, 130, 130,             // 31-33: Evoker
+        135, 135,                  // 34-35: Magus
+        151, 151, 151,             // 36-38: Earth Magus
+        163, 163, 163, 163, 163,  // 39-43: Lightning Magus
+        190, 190, 190, 190, 190,  // 44-48: Archmage
+        210, 210, 210, 210         // 49-52: Deity
+    ];
+
+    // Enchantments (15 items) — one per rank gate
+    const ENCHANTMENT_THRESHOLDS = [
+        18,   // Journeyman
+        30,   // Sorcerer
+        42,   // Warlock
+        54,   // Wizard
+        66,   // Dark Magician
+        78,   // Conjurer
+        84,   // Diviner
+        95,   // Enchantress
+        105,  // Illusionist
+        120,  // Summoner
+        139,  // Fire Magus
+        155,  // Ice Magus
+        168,  // Arch Magus
+        190,  // Archmage
+        210   // Deity
+    ];
+
+    // Wizardries (8 items) — one per rank gate
+    const WIZARDRY_THRESHOLDS = [
+        3,    // Initiate
+        24,   // Adept
+        48,   // Enchanter
+        72,   // White Magician
+        100,  // Abjurer
+        143,  // Water Magus
+        173,  // Grand Magus
+        204   // Eldritch
+    ];
+
+    function getMinAchievementsForItem(category, index) {
+        switch (category) {
+            case 'familiars':
+                return FAMILIAR_THRESHOLDS[index] || 210;
+            case 'enchantments':
+                return ENCHANTMENT_THRESHOLDS[index] || 210;
+            case 'wizardries':
+                return WIZARDRY_THRESHOLDS[index] || 204;
+            default:
+                return 0;
+        }
+    }
 
     // Familiars - MPS boost, sorted by cost
-    // Unlock: Previous familiar purchased + Rank 3 threshold for first
-    // Some elementals have special requirements (requires field)
+    // Unlock: Previous familiar purchased + rank threshold + special requires
     const familiars = [
         { id: 'familiar-sprite', name: 'Sprite', cost: 4500, mpsBoost: 0.01 },
         { id: 'familiar-imp', name: 'Imp', cost: 4500, mpsBoost: 0.01 },
@@ -67,7 +125,6 @@ const RankingUpgradesModule = (function() {
     ];
 
     // Enchantments - MPS boost (all 1%), sorted by cost
-    // Unlock: Previous enchantment purchased + Rank 5 threshold for first
     const enchantments = [
         { id: 'enchant-infuse-magic', name: 'Infuse Magic', cost: 15000, mpsBoost: 0.01 },
         { id: 'enchant-basic', name: 'Basic Enchantment', cost: 55000, mpsBoost: 0.01 },
@@ -87,7 +144,6 @@ const RankingUpgradesModule = (function() {
     ];
 
     // Wizardries - MPS boost (all 2%), sorted by cost
-    // Unlock: Achievement thresholds + Rank 2 for first
     const wizardries = [
         { id: 'wizardry-warlock', name: 'Warlock', cost: 95000, mpsBoost: 0.02 },
         { id: 'wizardry-witch', name: 'Witch', cost: 950000, mpsBoost: 0.02 },
@@ -111,37 +167,26 @@ const RankingUpgradesModule = (function() {
         return 0;
     }
 
-    function isCategoryUnlocked(category) {
-        const count = getAchievementCount();
-        switch(category) {
-            case 'familiars': return count >= RANK_THRESHOLDS.FAMILIARS;
-            case 'enchantments': return count >= RANK_THRESHOLDS.ENCHANTMENTS;
-            case 'wizardries': return count >= RANK_THRESHOLDS.WIZARDRIES;
-            default: return false;
-        }
+    // Check whether the item at this index meets its per-item rank gate.
+    function meetsRankGate(category, index) {
+        return getAchievementCount() >= getMinAchievementsForItem(category, index);
     }
 
-    function isUpgradeUnlocked(category, index) {
-        if (!isCategoryUnlocked(category)) return false;
+    // Check sequential/special-requirement gating (ignoring rank gate).
+    function meetsSequentialGate(category, index) {
         if (index === 0) return true;
 
-        // Check if previous upgrade in the category is purchased
         let purchased;
-        switch(category) {
+        switch (category) {
             case 'familiars':
                 purchased = purchasedFamiliars;
                 const familiar = familiars[index];
-                // Check special requirements first (e.g., Ice Elemental requires Air + Water)
                 if (familiar.requires) {
-                    const allRequirementsMet = familiar.requires.every(reqId => purchased[reqId] === true);
-                    if (!allRequirementsMet) return false;
-                    return true; // Requirements met, unlock available
+                    return familiar.requires.every(reqId => purchased[reqId] === true);
                 }
-                // Standard sequential unlock
                 return purchased[familiars[index - 1].id] === true;
             case 'enchantments':
                 purchased = purchasedEnchantments;
-                // Godly Enchantment requires Deity wizardry
                 if (enchantments[index].requiresDeity && !purchasedWizardries['wizardry-deity']) {
                     return false;
                 }
@@ -154,8 +199,12 @@ const RankingUpgradesModule = (function() {
         }
     }
 
+    function isUpgradeUnlocked(category, index) {
+        return meetsSequentialGate(category, index) && meetsRankGate(category, index);
+    }
+
     function isPurchased(category, id) {
-        switch(category) {
+        switch (category) {
             case 'familiars': return purchasedFamiliars[id] === true;
             case 'enchantments': return purchasedEnchantments[id] === true;
             case 'wizardries': return purchasedWizardries[id] === true;
@@ -165,7 +214,7 @@ const RankingUpgradesModule = (function() {
 
     function purchase(category, id) {
         let upgrade, purchased;
-        switch(category) {
+        switch (category) {
             case 'familiars':
                 upgrade = familiars.find(f => f.id === id);
                 purchased = purchasedFamiliars;
@@ -205,20 +254,20 @@ const RankingUpgradesModule = (function() {
         <section id="ranking-upgrades-panel" class="game-panel" hidden>
             <h2 id="ranking-upgrades-heading" tabindex="-1">Ranking Upgrades</h2>
             <div id="ranking-upgrades-container" aria-labelledby="ranking-upgrades-heading">
-                <p class="ranking-info">Unlock new upgrade categories by earning achievements!</p>
+                <p class="ranking-info">Unlock new upgrades by earning achievements and advancing your wizard rank!</p>
 
                 <div class="ranking-category" id="wizardries-section">
-                    <h3>Wizardries <span class="unlock-info">(Unlocks at Rank 2 - Initiate)</span></h3>
+                    <h3>Wizardries <span class="unlock-info">(Unlocks at Initiate)</span></h3>
                     <div id="wizardries-list" class="ranking-upgrades-list"></div>
                 </div>
 
                 <div class="ranking-category" id="familiars-section">
-                    <h3>Familiars <span class="unlock-info">(Unlocks at Rank 3 - Novice)</span></h3>
+                    <h3>Familiars <span class="unlock-info">(Unlocks at Novice)</span></h3>
                     <div id="familiars-list" class="ranking-upgrades-list"></div>
                 </div>
 
                 <div class="ranking-category" id="enchantments-section">
-                    <h3>Enchantments <span class="unlock-info">(Unlocks at Rank 5 - Journeyman)</span></h3>
+                    <h3>Enchantments <span class="unlock-info">(Unlocks at Journeyman)</span></h3>
                     <div id="enchantments-list" class="ranking-upgrades-list"></div>
                 </div>
             </div>
@@ -257,37 +306,43 @@ const RankingUpgradesModule = (function() {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        const categoryUnlocked = isCategoryUnlocked(category);
-
-        if (!categoryUnlocked) {
-            const threshold = RANK_THRESHOLDS[category.toUpperCase()];
-            const current = getAchievementCount();
-            container.innerHTML = `<p class="locked-message">Locked. Earn ${threshold - current} more achievements to unlock.</p>`;
+        // Check if the very first item's rank gate is met (category-level lock)
+        const firstThreshold = getMinAchievementsForItem(category, 0);
+        const achCount = getAchievementCount();
+        if (achCount < firstThreshold) {
+            const rankName = typeof WizardRankModule !== 'undefined'
+                ? WizardRankModule.getRankNameForCount(firstThreshold) : '???';
+            container.innerHTML = `<p class="locked-message">Locked. Reach ${rankName} rank (${firstThreshold - achCount} more achievements) to unlock.</p>`;
             return;
         }
 
         container.innerHTML = '';
+        let shownRankLocked = false; // Show at most 1 rank-locked teaser per category
 
         items.forEach((item, index) => {
-            const isUnlocked = isUpgradeUnlocked(category, index);
             const isPurch = purchased[item.id] === true;
-
-            if (!isUnlocked && !isPurch) return; // Don't show locked upgrades
-
-            const div = document.createElement('div');
-            div.className = 'ranking-upgrade-item' + (isPurch ? ' purchased' : '');
-            div.id = `ranking-${item.id}`;
-
-            const boostPercent = (item.mpsBoost * 100).toFixed(0);
-            const canAfford = mana >= item.cost;
+            const seqOK = meetsSequentialGate(category, index);
+            const rankOK = meetsRankGate(category, index);
 
             if (isPurch) {
+                // Always show purchased items
+                const div = document.createElement('div');
+                div.className = 'ranking-upgrade-item purchased';
+                div.id = `ranking-${item.id}`;
+                const boostPercent = (item.mpsBoost * 100).toFixed(0);
                 div.innerHTML = `
                     <span class="upgrade-name">${item.name}</span>
                     <span class="upgrade-effect">+${boostPercent}% MPS</span>
                     <span class="purchased-label">Purchased</span>
                 `;
-            } else {
+                container.appendChild(div);
+            } else if (seqOK && rankOK) {
+                // Fully unlocked — show with buy button
+                const div = document.createElement('div');
+                div.className = 'ranking-upgrade-item';
+                div.id = `ranking-${item.id}`;
+                const boostPercent = (item.mpsBoost * 100).toFixed(0);
+                const canAfford = mana >= item.cost;
                 div.innerHTML = `
                     <span class="upgrade-name">${item.name}</span>
                     <span class="upgrade-effect">+${boostPercent}% MPS</span>
@@ -298,9 +353,26 @@ const RankingUpgradesModule = (function() {
                         Buy
                     </button>
                 `;
+                container.appendChild(div);
+            } else if (seqOK && !rankOK && !shownRankLocked) {
+                // Sequentially ready but rank-locked — show teaser
+                shownRankLocked = true;
+                const needed = getMinAchievementsForItem(category, index);
+                const remaining = needed - achCount;
+                const rankName = typeof WizardRankModule !== 'undefined'
+                    ? WizardRankModule.getRankNameForCount(needed) : '???';
+                const div = document.createElement('div');
+                div.className = 'ranking-upgrade-item rank-locked';
+                div.id = `ranking-${item.id}`;
+                const boostPercent = (item.mpsBoost * 100).toFixed(0);
+                div.innerHTML = `
+                    <span class="upgrade-name">${item.name}</span>
+                    <span class="upgrade-effect">+${boostPercent}% MPS</span>
+                    <span class="rank-locked-message">Requires ${rankName} rank (${remaining} more achievements)</span>
+                `;
+                container.appendChild(div);
             }
-
-            container.appendChild(div);
+            // Otherwise: hidden (not sequentially ready, or already showed a rank-locked teaser)
         });
 
         // Check if all are purchased
@@ -365,7 +437,7 @@ const RankingUpgradesModule = (function() {
 
     function getPurchasedCount(category) {
         let purchased;
-        switch(category) {
+        switch (category) {
             case 'familiars': purchased = purchasedFamiliars; break;
             case 'enchantments': purchased = purchasedEnchantments; break;
             case 'wizardries': purchased = purchasedWizardries; break;
@@ -392,10 +464,9 @@ const RankingUpgradesModule = (function() {
         getSaveData,
         loadSaveData,
         resetForPrestige,
-        isCategoryUnlocked,
         getPurchasedCount,
         getTotalPurchasedCount,
         isDeityPurchased,
-        RANK_THRESHOLDS
+        getMinAchievementsForItem
     };
 })();

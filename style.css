@@ -740,6 +740,17 @@ h2:focus {
     border-radius: 4px;
 }
 
+.ranking-upgrade-item.rank-locked {
+    opacity: 0.55;
+    border-color: #3a3a4a;
+}
+
+.rank-locked-message {
+    color: #c89b3c;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
 .category-complete {
     color: #7cfc00;
     font-style: italic;

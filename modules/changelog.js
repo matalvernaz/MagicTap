@@ -2,6 +2,12 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '1.4',
+            date: '04-15-26',
+            summary: `Ranking Upgrades rebalanced across wizard ranks: familiars gated in 13 tiers, enchantments and wizardries individually gated. 32 of 40 ranks now unlock new items (was 5). Rank-locked teasers show what's coming and how many achievements you need.
+16 new achievements (231 total) for ranking upgrade milestones: familiars, enchantments, wizardries, and combined totals.`
+        },
+        {
             version: '1.3',
             date: '04-15-26',
             summary: `Fixed building bulk-buy charging more than single-buy when Challenge or Transcendence cost discounts were active; all paths now share one cost formula.

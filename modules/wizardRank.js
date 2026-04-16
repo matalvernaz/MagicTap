@@ -136,12 +136,25 @@ const WizardRankModule = (function() {
         return ranks;
     }
 
+    // Look up the rank name that corresponds to an arbitrary achievement count.
+    // Used by the Ranking Upgrades panel to show "Requires [RankName] rank".
+    function getRankNameForCount(count) {
+        let name = ranks[0].name;
+        for (let i = ranks.length - 1; i >= 0; i--) {
+            if (count <= ranks[i].minAchievements) {
+                name = ranks[i].name;
+            }
+        }
+        return name;
+    }
+
     return {
         getMagicProficiency,
         getCurrentRank,
         getNextRank,
         getProgressToNextRank,
         updateDisplay,
-        getAllRanks
+        getAllRanks,
+        getRankNameForCount
     };
 })();

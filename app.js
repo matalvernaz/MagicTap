@@ -1,4 +1,4 @@
-const VERSION = '1.3';
+const VERSION = '1.4';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -2756,8 +2756,8 @@ function updateSpellcastingButton() {
 function updateRankingUpgradesButton() {
     const rankingButton = document.getElementById('ranking-upgrades-button');
     if (rankingButton && typeof RankingUpgradesModule !== 'undefined') {
-        // Show button if any category is unlocked (Wizardries unlocks first at rank 2)
-        if (RankingUpgradesModule.isCategoryUnlocked('wizardries')) {
+        // Show button once the player has enough achievements for the first wizardry (Initiate rank)
+        if (AchievementsModule.getEarnedCount() >= RankingUpgradesModule.getMinAchievementsForItem('wizardries', 0)) {
             rankingButton.style.display = '';
         }
     }
