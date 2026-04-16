@@ -236,31 +236,35 @@ const ChallengesModule = (function() {
             notificationArea.appendChild(announcement);
             setTimeout(() => announcement.remove(), 3000);
 
-            const notification = document.createElement('div');
-            notification.className = 'notification challenge-complete-notification';
-            notification.setAttribute('role', 'region');
-            notification.setAttribute('aria-label', 'Challenge completed');
+            // Visible notification — gated by the Enable Notifications option.
+            const notificationsOn = typeof OptionsModule === 'undefined' || OptionsModule.getOptions().notificationsEnabled;
+            if (notificationsOn) {
+                const notification = document.createElement('div');
+                notification.className = 'notification challenge-complete-notification';
+                notification.setAttribute('role', 'region');
+                notification.setAttribute('aria-label', 'Challenge completed');
 
-            const dismissBtn = document.createElement('button');
-            dismissBtn.className = 'notification-dismiss';
-            dismissBtn.setAttribute('aria-label', 'Dismiss');
-            dismissBtn.textContent = 'X';
-            dismissBtn.addEventListener('click', () => notification.remove());
+                const dismissBtn = document.createElement('button');
+                dismissBtn.className = 'notification-dismiss';
+                dismissBtn.setAttribute('aria-label', 'Dismiss');
+                dismissBtn.textContent = 'X';
+                dismissBtn.addEventListener('click', () => notification.remove());
 
-            const title = document.createElement('p');
-            title.className = 'notification-title';
-            title.textContent = 'Challenge Completed!';
+                const title = document.createElement('p');
+                title.className = 'notification-title';
+                title.textContent = 'Challenge Completed!';
 
-            const content = document.createElement('p');
-            content.className = 'notification-content';
-            content.textContent = `${name} — ${reward}`;
+                const content = document.createElement('p');
+                content.className = 'notification-content';
+                content.textContent = `${name} — ${reward}`;
 
-            notification.appendChild(dismissBtn);
-            notification.appendChild(title);
-            notification.appendChild(content);
-            notificationArea.appendChild(notification);
+                notification.appendChild(dismissBtn);
+                notification.appendChild(title);
+                notification.appendChild(content);
+                notificationArea.appendChild(notification);
 
-            setTimeout(() => { if (notification.parentNode) notification.remove(); }, 20000);
+                setTimeout(() => { if (notification.parentNode) notification.remove(); }, 20000);
+            }
         }
 
         // Save

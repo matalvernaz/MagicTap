@@ -102,3 +102,10 @@ Balance pass on building cost/MPS curve:
 Smoothed prestige Potential tier costs:
 - Arcane Crystal (T4) 6B → 1B, Legion of the Weave (T5) 1T → 100B. Removes the 540×/167× cliffs between T3-T5 in favor of a consistent ~100× step through mid-game tiers.
 Fixed Mysterious Stranger flavor event penalty scaling (was 5% of current Mana; now 45 seconds of production). Previously turned net-negative whenever the player had more than ~30 minutes of Mana banked, punishing offline returns and savings.
+V.1.3, 04-15-2026:
+Fixed building bulk-buy charging more than single-buy: cost modifiers from Challenge rewards and Transcendence upgrades were skipped by the x10/x100/Max paths but applied to the displayed single-buy price. All cost paths now funnel through one formula.
+Fixed tutorial re-showing on every page load: the final step's dismiss handler never wrote the completion flag. Existing saves also now write the flag defensively on load.
+Fixed Options "Enable Notifications" toggle being ignored: the flag was stored but never checked before firing visible notifications (achievements, game notifications, offline progress, challenge complete).
+Fixed Ranking Upgrades buy buttons staying disabled until panel reopen: added live affordability refresh in the game loop.
+Fixed screen-reader users not hearing time-until-affordable for buildings: aria-label now includes the countdown, matching the visible button text.
+Fixed building descriptions containing hard-coded base production numbers that went stale after buying upgrades; replaced with thematic descriptions (the dynamic "Each: X MPS" line below already shows live production).

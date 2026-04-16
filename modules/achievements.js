@@ -1031,6 +1031,9 @@ const AchievementsModule = (function() {
     }
 
     function showNotification(achievementName, achievementDescription) {
+        // Respect the "Enable Notifications" option.
+        if (typeof OptionsModule !== 'undefined' && !OptionsModule.getOptions().notificationsEnabled) return;
+
         const notificationArea = document.getElementById('notification-area');
         if (!notificationArea) return;
 

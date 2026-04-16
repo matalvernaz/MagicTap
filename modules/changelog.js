@@ -2,6 +2,16 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '1.3',
+            date: '04-15-26',
+            summary: `Fixed building bulk-buy charging more than single-buy when Challenge or Transcendence cost discounts were active; all paths now share one cost formula.
+Fixed tutorial re-appearing on every page load — the final step never wrote its completion flag.
+Fixed Options "Enable Notifications" toggle being ignored by achievement, game, offline-progress, and challenge-complete notifications.
+Fixed Ranking Upgrades Buy buttons staying disabled until the panel was closed and reopened; affordability now refreshes live.
+Fixed screen-reader users not hearing the time-until-affordable countdown on buildings; aria-label now matches the visible text.
+Replaced stale hard-coded production numbers in building descriptions with thematic text (the live "Each: X MPS" display below already shows real production).`
+        },
+        {
             version: '1.1',
             date: '04-14-26',
             summary: `79 new achievements (201 total) covering MPS, clicks, prestiges, challenges, spells, synergies, and more.

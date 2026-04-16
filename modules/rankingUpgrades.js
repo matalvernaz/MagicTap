@@ -231,6 +231,28 @@ const RankingUpgradesModule = (function() {
         renderCategory('wizardries', wizardries, purchasedWizardries, 'wizardries-list');
     }
 
+    // Lightweight affordability refresh — called from the game loop so the
+    // Buy buttons enable the moment the player accrues enough Mana, without
+    // having to close and reopen the panel. Doesn't rebuild DOM.
+    function refreshAffordability() {
+        const panel = document.getElementById('ranking-upgrades-panel');
+        if (!panel || panel.hidden) return;
+        const buttons = panel.querySelectorAll('.buy-ranking-upgrade-btn');
+        buttons.forEach(btn => {
+            const category = btn.dataset.category;
+            const id = btn.dataset.id;
+            let item;
+            if (category === 'familiars') item = familiars.find(f => f.id === id);
+            else if (category === 'enchantments') item = enchantments.find(e => e.id === id);
+            else if (category === 'wizardries') item = wizardries.find(w => w.id === id);
+            if (!item) return;
+            const canAfford = mana >= item.cost;
+            if (btn.disabled === canAfford) {
+                btn.disabled = !canAfford;
+            }
+        });
+    }
+
     function renderCategory(category, items, purchased, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -366,6 +388,7 @@ const RankingUpgradesModule = (function() {
         getHTML,
         init,
         renderUpgrades,
+        refreshAffordability,
         getSaveData,
         loadSaveData,
         resetForPrestige,

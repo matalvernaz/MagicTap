@@ -1,4 +1,4 @@
-const VERSION = '1.1';
+const VERSION = '1.3';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -27,6 +27,9 @@ let bulkBuyAmount = 1;
 // --- Game Notification System ---
 // Global notification function used by modules (replaces missing NotificationModule)
 function showGameNotification(message, type) {
+    // Respect the "Enable Notifications" option.
+    if (typeof OptionsModule !== 'undefined' && !OptionsModule.getOptions().notificationsEnabled) return;
+
     const notificationArea = document.getElementById('notification-area');
     if (!notificationArea) return;
 
@@ -200,7 +203,7 @@ const buildings = [
     {
         id: 'wizards-hand',
         name: 'Wizard\'s Hand',
-        description: 'Generates 0.1 Mana per second.',
+        description: 'A spectral hand that pulls ambient Mana from the aether.',
         flavorText: 'A spectral hand that gathers ambient mana from the air.',
         baseCost: 10,
         baseProduction: 0.1,
@@ -213,7 +216,7 @@ const buildings = [
     {
         id: 'wizards-eye',
         name: 'Wizard\'s Eye',
-        description: 'Generates 0.5 Mana per second.',
+        description: 'Perceives strands of Mana invisible to the untrained.',
         flavorText: 'One must see power, to be able to grasp it.',
         baseCost: 50,
         baseProduction: 0.5,
@@ -252,7 +255,7 @@ const buildings = [
     {
         id: 'mana-crystal',
         name: 'Mana Crystal',
-        description: 'Crystallize raw Mana into a refined form for 38 Mana per second.',
+        description: 'Crystallizes raw Mana into a refined, steadily-radiating form.',
         flavorText: 'Mana, refined into a tangible form.',
         baseCost: 21750,
         baseProduction: 38,
@@ -1956,27 +1959,32 @@ const upgrades = [
 ];
 
 // --- Helper Functions ---
+
+// Shared building cost primitives. Single-buy, bulk-buy, and max-affordable
+// calculations MUST all funnel through these so the displayed cost, the
+// bulk-total, and the amount actually deducted never drift apart when
+// runestones/spells/challenges/transcendence modifiers are active.
+function getBuildingCostExponent() {
+    return (typeof ChallengesModule !== 'undefined' && ChallengesModule.getBuildingCostExponent()) || 1.15;
+}
+
+function getBuildingCostMultiplier() {
+    let mult = 1;
+    if (typeof RunestonesModule !== 'undefined') mult *= RunestonesModule.getTempBuildingCostMultiplier();
+    if (typeof SpellcastingModule !== 'undefined') mult *= SpellcastingModule.getBuildingCostMultiplier();
+    if (typeof ChallengesModule !== 'undefined') mult *= ChallengesModule.getBuildingCostMultiplier();
+    if (typeof TranscendenceModule !== 'undefined') mult *= TranscendenceModule.getBuildingCostMultiplier();
+    return mult;
+}
+
+// Cost of the (ownedOverride+1)th copy, with all active modifiers applied.
+function getBuildingCostAt(building, ownedOverride) {
+    const owned = ownedOverride === undefined ? building.owned : ownedOverride;
+    return building.baseCost * Math.pow(getBuildingCostExponent(), owned) * getBuildingCostMultiplier();
+}
+
 function getBuildingCurrentCost(building) {
-    // Exponential cost increase: baseCost * exponent^owned
-    const exponent = (typeof ChallengesModule !== 'undefined' && ChallengesModule.getBuildingCostExponent()) || 1.15;
-    let cost = building.baseCost * Math.pow(exponent, building.owned);
-    // Apply runestone building cost modifier
-    if (typeof RunestonesModule !== 'undefined') {
-        cost *= RunestonesModule.getTempBuildingCostMultiplier();
-    }
-    // Apply spellcasting building cost modifier
-    if (typeof SpellcastingModule !== 'undefined') {
-        cost *= SpellcastingModule.getBuildingCostMultiplier();
-    }
-    // Apply challenge reward: permanent cost reduction
-    if (typeof ChallengesModule !== 'undefined') {
-        cost *= ChallengesModule.getBuildingCostMultiplier();
-    }
-    // Apply transcendence cost reduction
-    if (typeof TranscendenceModule !== 'undefined') {
-        cost *= TranscendenceModule.getBuildingCostMultiplier();
-    }
-    return cost;
+    return getBuildingCostAt(building, building.owned);
 }
 
 function getUpgradeCurrentCost(upgrade) {
@@ -2252,17 +2260,12 @@ function showFloatingNumber(amount) {
 }
 
 // --- Bulk Buy Logic ---
+// Both bulk-total and max-affordable go through getBuildingCostAt so all
+// cost modifiers stay in sync with the single-buy displayed price.
 function getBulkBuildingCost(building, count) {
     let totalCost = 0;
-    let costMultiplier = 1;
-    if (typeof RunestonesModule !== 'undefined') {
-        costMultiplier *= RunestonesModule.getTempBuildingCostMultiplier();
-    }
-    if (typeof SpellcastingModule !== 'undefined') {
-        costMultiplier *= SpellcastingModule.getBuildingCostMultiplier();
-    }
     for (let i = 0; i < count; i++) {
-        totalCost += building.baseCost * Math.pow((typeof ChallengesModule !== 'undefined' && ChallengesModule.getBuildingCostExponent()) || 1.15, building.owned + i) * costMultiplier;
+        totalCost += getBuildingCostAt(building, building.owned + i);
     }
     return totalCost;
 }
@@ -2270,15 +2273,8 @@ function getBulkBuildingCost(building, count) {
 function getMaxBuyable(building) {
     let count = 0;
     let totalCost = 0;
-    let costMultiplier = 1;
-    if (typeof RunestonesModule !== 'undefined') {
-        costMultiplier *= RunestonesModule.getTempBuildingCostMultiplier();
-    }
-    if (typeof SpellcastingModule !== 'undefined') {
-        costMultiplier *= SpellcastingModule.getBuildingCostMultiplier();
-    }
     while (true) {
-        const nextCost = building.baseCost * Math.pow((typeof ChallengesModule !== 'undefined' && ChallengesModule.getBuildingCostExponent()) || 1.15, building.owned + count) * costMultiplier;
+        const nextCost = getBuildingCostAt(building, building.owned + count);
         if (totalCost + nextCost > mana) break;
         totalCost += nextCost;
         count++;
@@ -2615,7 +2611,9 @@ function checkAffordability() {
                 const timeStr = formatTime(timeUntil);
                 const timerDisplay = timeStr ? `, ${timeStr}` : '';
                 buyButton.textContent = `Buy${bulkLabel} ${building.name}, Not Affordable${timerDisplay}`;
-                buyButton.setAttribute('aria-label', `Buy${bulkLabel} ${building.name}, costs ${OptionsModule.formatNumber(Math.floor(cost))} Mana`);
+                // Include the time-until-affordable in the aria-label so screen
+                // reader users hear the same countdown sighted players see.
+                buyButton.setAttribute('aria-label', `Buy${bulkLabel} ${building.name}, costs ${OptionsModule.formatNumber(Math.floor(cost))} Mana, Not Affordable${timerDisplay}`);
                 buyButton.classList.add('cannot-buy');
                 buyButton.classList.remove('can-buy');
             }
@@ -2950,6 +2948,13 @@ function gameLoop() {
 
         // Update prestige display
         PrestigeModule.updateDisplay();
+
+        // Refresh Ranking Upgrades affordability if the panel is open —
+        // otherwise buy buttons stay disabled until the player closes and
+        // reopens the panel (forum report from musicman).
+        if (typeof RankingUpgradesModule !== 'undefined' && RankingUpgradesModule.refreshAffordability) {
+            RankingUpgradesModule.refreshAffordability();
+        }
     }
 
     // Update Wishing Well (coin generation)

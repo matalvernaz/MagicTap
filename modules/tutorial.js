@@ -47,9 +47,12 @@ const TutorialModule = (function() {
     ];
 
     function init() {
-        // Don't show tutorial if there's existing save data
+        // Don't show tutorial if there's existing save data.
+        // Also persist the completion flag so the tutorial stays dismissed
+        // even if the save is wiped but this localStorage key survives.
         if (localStorage.getItem('magictap_save')) {
             isComplete = true;
+            localStorage.setItem('magictap_tutorial_complete', 'true');
             return;
         }
         if (localStorage.getItem('magictap_tutorial_complete')) {
@@ -111,6 +114,9 @@ const TutorialModule = (function() {
             if (nextStep && !nextStep.trigger) {
                 // Small delay so the player can see the highlighted element
                 setTimeout(() => showStep(currentStep + 1), step.highlight ? 2000 : 500);
+            } else if (!nextStep) {
+                // Final step dismissed — mark tutorial complete so it doesn't show again.
+                completeTutorial();
             }
             // Steps with triggers are shown by checkTriggers()
         });
