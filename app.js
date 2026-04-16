@@ -1,4 +1,4 @@
-const VERSION = '1.5';
+const VERSION = '1.6';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -3229,6 +3229,9 @@ document.addEventListener('keydown', (e) => {
 
     if (key === 'g') {
         // G = Gather Mana
+        if (typeof SoundModule !== 'undefined') {
+            SoundModule.playGather();
+        }
         gatherMana();
     } else if (panelKeys[key]) {
         const btn = document.getElementById(panelKeys[key]);

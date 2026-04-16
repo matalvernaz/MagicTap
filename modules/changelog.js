@@ -2,6 +2,15 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '1.6',
+            date: '04-16-26',
+            summary: `Fixed Spells Cast statistic stuck at 0 — the counter was never incremented when casting spells.
+Screen reader users now hear the full spell description, cost, and duration when focused on Cast buttons (matches the Wishing Well pattern).
+Pressing G to gather mana now plays the gather sound (previously silent, only mouse clicks played sound).
+Runestones play an activation sound when clicked.
+Wishing Well effects play a sound when triggered.`
+        },
+        {
             version: '1.5',
             date: '04-16-26',
             summary: `Fixed challenges activating without prestige — challenges now require at least one prestige before they can be started. Existing saves with exploited challenges are cleaned up on load.

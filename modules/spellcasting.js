@@ -180,6 +180,13 @@ const SpellcastingModule = (function() {
         // Deduct spell power
         spellPower -= spell.cost;
 
+        if (typeof StatisticsModule !== 'undefined') {
+            StatisticsModule.addSpellCast();
+        }
+        if (typeof SoundModule !== 'undefined') {
+            SoundModule.play('upgradePurchase');
+        }
+
         // Handle instant spells
         if (spell.effect.type === 'summonRunestone') {
             if (typeof RunestonesModule !== 'undefined') {
@@ -327,18 +334,21 @@ const SpellcastingModule = (function() {
         const container = document.getElementById('spells-list-container');
         if (!container) return;
 
-        container.innerHTML = spells.map(spell => `
+        container.innerHTML = spells.map(spell => {
+            const ariaLabel = `Cast ${spell.name}, costs ${spell.cost} Spell Power. ${spell.description}`;
+            return `
             <div class="spell-item" id="spell-${spell.id}">
                 <div class="spell-info">
                     <p class="spell-name">${spell.name}</p>
                     <p class="spell-description">${spell.description}</p>
                     <p class="spell-cost">Cost: ${spell.cost} Spell Power</p>
                 </div>
-                <button id="cast-${spell.id}" class="cast-spell-button" ${spellPower < spell.cost ? 'disabled' : ''}>
+                <button id="cast-${spell.id}" class="cast-spell-button" aria-label="${ariaLabel}" ${spellPower < spell.cost ? 'disabled' : ''}>
                     Cast
                 </button>
             </div>
-        `).join('');
+        `;
+        }).join('');
 
         // Add event listeners
         spells.forEach(spell => {

@@ -273,6 +273,10 @@ const WishingWellModule = (function() {
         // Spend the coins
         spendCoins(effect.cost);
 
+        if (typeof SoundModule !== 'undefined') {
+            SoundModule.play('upgradePurchase');
+        }
+
         // Check for backfire
         let finalEffect = effect;
         if (effect.backfireId && Math.random() < BACKFIRE_CHANCE) {

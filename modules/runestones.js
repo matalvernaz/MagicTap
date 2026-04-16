@@ -402,6 +402,10 @@ const RunestonesModule = (function() {
         const effect = activeRunestone.effect;
         const resultMessage = effect.apply();
 
+        if (typeof SoundModule !== 'undefined') {
+            SoundModule.play('achievement');
+        }
+
         // Show notification
         if (typeof showGameNotification === 'function') {
             const type = activeRunestone.isPositive ? 'success' : 'warning';
