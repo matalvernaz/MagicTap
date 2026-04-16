@@ -101,6 +101,15 @@
     color: #ccc;
 }
 
+.achievement-item.locked {
+    border-left-color: #666;
+    opacity: 0.6;
+}
+
+.achievement-item.locked .achievement-name {
+    color: #aaa;
+}
+
 /* Production Panel */
 .production-upgrades {
     background-color: #3a3a3a;

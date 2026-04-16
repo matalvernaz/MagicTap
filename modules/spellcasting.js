@@ -428,11 +428,27 @@ const SpellcastingModule = (function() {
         renderActiveSpells();
     }
 
+    // Eternal Cantrip autocast: cast most expensive affordable non-instant spell
+    // when spell power is >= 90% of max, and that spell is not already active.
+    function tryAutocast() {
+        if (spellPower < MAX_SPELL_POWER * 0.9) return false;
+
+        const candidates = spells
+            .filter(s => s.cost <= spellPower)
+            .filter(s => s.effect.type !== 'summonRunestone') // don't burn SP on random runestones
+            .filter(s => !activeSpells.some(a => a.spellId === s.id)) // don't re-cast active spells
+            .sort((a, b) => b.cost - a.cost);
+
+        if (candidates.length === 0) return false;
+        return castSpell(candidates[0].id);
+    }
+
     return {
         init,
         update,
         updateDisplay,
         castSpell,
+        tryAutocast,
         getMPCMultiplier,
         getMPSMultiplier,
         getBuildingCostMultiplier,

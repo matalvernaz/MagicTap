@@ -466,6 +466,25 @@ const WishingWellModule = (function() {
         deactivateEffect();
     }
 
+    // Prolific Wish autocast: trigger most expensive affordable non-backfire, positive,
+    // level-unlocked effect when coins are at max and no effect is active.
+    function tryAutotrigger() {
+        if (!isUnlocked) return false;
+        if (activeEffect !== null) return false;
+        if (coins < maxCoins) return false;
+
+        const candidates = effects
+            .filter(e => !e.isBackfire)
+            .filter(e => e.isPositive)
+            .filter(e => !e.minLevel || level >= e.minLevel)
+            .filter(e => coins >= e.cost)
+            .sort((a, b) => b.cost - a.cost);
+
+        if (candidates.length === 0) return false;
+        triggerEffect(candidates[0].id);
+        return true;
+    }
+
     return {
         getHTML,
         updateDisplay,
@@ -480,6 +499,7 @@ const WishingWellModule = (function() {
         getEffectTriggerCount,
         addCoins,
         getCoinGenerationRate,
+        tryAutotrigger,
         loadState,
         getState,
         reset

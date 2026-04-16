@@ -109,6 +109,24 @@ const TranscendenceModule = (function() {
             isPurchased: false,
             requiresUpgrade: 'beyond-mortality',
             effect: { type: 'offlineCap', value: 24 }
+        },
+        {
+            id: 'eternal-cantrip',
+            name: 'Eternal Cantrip',
+            description: 'Spells cast themselves when your Spell Power is nearly full. The most powerful affordable spell fires first.',
+            flavorText: 'The incantations never leave your lips. You have become the spell.',
+            cost: 5,
+            isPurchased: false,
+            effect: { type: 'autocastSpells' }
+        },
+        {
+            id: 'prolific-wish',
+            name: 'Prolific Wish',
+            description: 'Wishing Well effects trigger themselves when your coins are nearly full. The most valuable affordable effect fires first.',
+            flavorText: 'The well remembers every wish. It does not wait to be asked.',
+            cost: 4,
+            isPurchased: false,
+            effect: { type: 'autoWell' }
         }
     ];
 
@@ -198,6 +216,16 @@ const TranscendenceModule = (function() {
             if (u.isPurchased && u.effect.type === 'prestigeMultiplier') mult *= u.effect.value;
         });
         return mult;
+    }
+
+    function hasAutocastSpells() {
+        const upgrade = transcendenceUpgrades.find(u => u.id === 'eternal-cantrip');
+        return !!(upgrade && upgrade.isPurchased);
+    }
+
+    function hasAutoWell() {
+        const upgrade = transcendenceUpgrades.find(u => u.id === 'prolific-wish');
+        return !!(upgrade && upgrade.isPurchased);
     }
 
     // --- UI ---
@@ -399,6 +427,8 @@ const TranscendenceModule = (function() {
         getOfflineRate,
         getOfflineCapHours,
         getPrestigeMultiplier,
+        hasAutocastSpells,
+        hasAutoWell,
         getSaveData,
         loadSaveData,
         reset

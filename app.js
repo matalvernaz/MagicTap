@@ -1,4 +1,4 @@
-const VERSION = '1.6';
+const VERSION = '1.7';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -85,6 +85,7 @@ function initializePanels() {
     RankingUpgradesModule.init();
     ChangelogModule.renderChangelog();
     AchievementsModule.renderAchievements();
+    AchievementsModule.initLockedToggle();
 }
 
 // Navigation buttons - will be populated after panels are initialized
@@ -2983,6 +2984,17 @@ function gameLoop() {
     if (typeof SpellcastingModule !== 'undefined') {
         SpellcastingModule.update(deltaSeconds);
         SpellcastingModule.updateDisplay();
+
+        // Eternal Cantrip transcendence: autocast at near-full Spell Power
+        if (typeof TranscendenceModule !== 'undefined' && TranscendenceModule.hasAutocastSpells()) {
+            SpellcastingModule.tryAutocast();
+        }
+    }
+
+    // Prolific Wish transcendence: auto-trigger Wishing Well effects at max coins
+    if (typeof TranscendenceModule !== 'undefined' && TranscendenceModule.hasAutoWell() &&
+        typeof WishingWellModule !== 'undefined') {
+        WishingWellModule.tryAutotrigger();
     }
 
     updateDisplay();

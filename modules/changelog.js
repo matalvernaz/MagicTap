@@ -2,6 +2,14 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '1.7',
+            date: '04-16-26',
+            summary: `Achievements panel now has a "Show locked achievements (spoilers)" toggle that lists all unearned achievements with their descriptions, so you can see exactly what you're missing.
+Two new Transcendence upgrades for hands-free late-game play:
+- Eternal Cantrip (5 Essence): spells cast themselves when Spell Power is near full, picking the most expensive affordable spell first.
+- Prolific Wish (4 Essence): Wishing Well effects trigger themselves when coins are at max, picking the most valuable affordable effect first.`
+        },
+        {
             version: '1.6',
             date: '04-16-26',
             summary: `Fixed Spells Cast statistic stuck at 0 — the counter was never incremented when casting spells.

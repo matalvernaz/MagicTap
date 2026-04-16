@@ -1088,6 +1088,8 @@ const AchievementsModule = (function() {
         updateDismissAllButton();
     }
 
+    let showLocked = false;
+
     function getHTML() {
         return `
         <section id="achievements-panel" class="game-panel" hidden>
@@ -1098,6 +1100,10 @@ const AchievementsModule = (function() {
                 <p id="rank-progress">25 achievements until Initiate</p>
             </div>
             <p id="achievements-count">Achievements Earned: <span>0</span></p>
+            <label class="option-item" style="display:block;margin:8px 0;">
+                <input type="checkbox" id="option-show-locked-achievements">
+                Show locked achievements (spoilers)
+            </label>
             <div id="achievements-container" aria-labelledby="achievements-heading">
                 <ul id="achievements-list" class="achievements-list"></ul>
             </div>
@@ -1121,12 +1127,36 @@ const AchievementsModule = (function() {
             }
         });
 
+        if (showLocked) {
+            achievements.forEach(achievement => {
+                if (!achievement.isEarned) {
+                    const li = document.createElement('li');
+                    li.className = 'achievement-item locked';
+                    li.innerHTML = `
+                        <span class="achievement-name">${achievement.name} (Locked)</span>
+                        <span class="achievement-description">${achievement.description}</span>
+                    `;
+                    list.appendChild(li);
+                }
+            });
+        }
+
         document.querySelector('#achievements-count span').textContent = earnedCount;
 
         // Update wizard rank display
         if (typeof WizardRankModule !== 'undefined') {
             WizardRankModule.updateDisplay();
         }
+    }
+
+    function initLockedToggle() {
+        const toggle = document.getElementById('option-show-locked-achievements');
+        if (!toggle) return;
+        toggle.checked = showLocked;
+        toggle.addEventListener('change', (e) => {
+            showLocked = e.target.checked;
+            renderAchievements();
+        });
     }
 
     function checkAchievements(stats) {
@@ -1188,6 +1218,7 @@ const AchievementsModule = (function() {
         getEarnedCount,
         getAchievements,
         loadAchievements,
-        reset
+        reset,
+        initLockedToggle
     };
 })();
