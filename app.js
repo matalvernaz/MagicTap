@@ -1,4 +1,4 @@
-const VERSION = '1.8';
+const VERSION = '1.9';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -2990,13 +2990,15 @@ function gameLoop() {
         SpellcastingModule.updateDisplay();
 
         // Eternal Cantrip transcendence: autocast at near-full Spell Power
-        if (typeof TranscendenceModule !== 'undefined' && TranscendenceModule.hasAutocastSpells()) {
+        const autocastEnabled = typeof OptionsModule === 'undefined' || OptionsModule.getOptions().autocastSpellsEnabled !== false;
+        if (autocastEnabled && typeof TranscendenceModule !== 'undefined' && TranscendenceModule.hasAutocastSpells()) {
             SpellcastingModule.tryAutocast();
         }
     }
 
     // Prolific Wish transcendence: auto-trigger Wishing Well effects at max coins
-    if (typeof TranscendenceModule !== 'undefined' && TranscendenceModule.hasAutoWell() &&
+    const autoWellEnabled = typeof OptionsModule === 'undefined' || OptionsModule.getOptions().autoWellEnabled !== false;
+    if (autoWellEnabled && typeof TranscendenceModule !== 'undefined' && TranscendenceModule.hasAutoWell() &&
         typeof WishingWellModule !== 'undefined') {
         WishingWellModule.tryAutotrigger();
     }

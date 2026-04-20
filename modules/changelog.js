@@ -2,6 +2,11 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '1.9',
+            date: '04-20-26',
+            summary: `Added Options toggles for the two Transcendence automations: Eternal Cantrip (autocast spells) and Prolific Wish (auto-trigger the Wishing Well). Turn them off per run if you want to manage spells or the well by hand without refunding the Essence.`
+        },
+        {
             version: '1.8',
             date: '04-20-26',
             summary: `Prestige Store is no longer a trap — you can open it without pending crystals (to spend existing ones), and a new "Return to Run" button lets you leave the store without resetting your run. The prestige panel text now accurately explains the flow.

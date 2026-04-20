@@ -7,8 +7,10 @@ const OptionsModule = (function() {
         autoSaveInterval: 30,
         truncateLargeNumbers: false,
         numberFormat: 'basic', // 'basic' or 'scientific'
-        autoGatherEnabled: true, // overrides Arcane Auto-Gather prestige upgrade
-        autoBuyEnabled: true     // overrides Arcane Automation prestige upgrade
+        autoGatherEnabled: true,      // overrides Arcane Auto-Gather prestige upgrade
+        autoBuyEnabled: true,         // overrides Arcane Automation prestige upgrade
+        autocastSpellsEnabled: true,  // overrides Eternal Cantrip transcendence
+        autoWellEnabled: true         // overrides Prolific Wish transcendence
     };
 
     function getHTML() {
@@ -45,7 +47,7 @@ const OptionsModule = (function() {
                 </div>
                 <div class="option-group">
                     <h3>Automation</h3>
-                    <p class="option-help">These toggles override prestige automation upgrades. Turn them off if you want to manage buildings or gather mana yourself this run.</p>
+                    <p class="option-help">These toggles override your purchased automation upgrades. Turn them off if you want to manage buildings, rankings, spells, or the Wishing Well yourself this run.</p>
                     <label class="option-item">
                         <input type="checkbox" id="option-auto-gather" checked>
                         Enable Arcane Auto-Gather (auto-click once per second)
@@ -53,6 +55,14 @@ const OptionsModule = (function() {
                     <label class="option-item">
                         <input type="checkbox" id="option-auto-buy" checked>
                         Enable Arcane Automation (auto-buy cheapest upgrade &amp; building every 3 seconds)
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="option-autocast-spells" checked>
+                        Enable Eternal Cantrip (autocast spells at near-full Spell Power)
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="option-auto-well" checked>
+                        Enable Prolific Wish (auto-trigger Wishing Well at max coins)
                     </label>
                 </div>
                 <div class="option-group">
@@ -144,6 +154,8 @@ const OptionsModule = (function() {
         // Automation toggles
         const autoGatherCheckbox = document.getElementById('option-auto-gather');
         const autoBuyCheckbox = document.getElementById('option-auto-buy');
+        const autocastSpellsCheckbox = document.getElementById('option-autocast-spells');
+        const autoWellCheckbox = document.getElementById('option-auto-well');
 
         if (autoGatherCheckbox) {
             autoGatherCheckbox.addEventListener('change', (e) => {
@@ -154,6 +166,18 @@ const OptionsModule = (function() {
         if (autoBuyCheckbox) {
             autoBuyCheckbox.addEventListener('change', (e) => {
                 options.autoBuyEnabled = e.target.checked;
+            });
+        }
+
+        if (autocastSpellsCheckbox) {
+            autocastSpellsCheckbox.addEventListener('change', (e) => {
+                options.autocastSpellsEnabled = e.target.checked;
+            });
+        }
+
+        if (autoWellCheckbox) {
+            autoWellCheckbox.addEventListener('change', (e) => {
+                options.autoWellEnabled = e.target.checked;
             });
         }
 
@@ -276,6 +300,8 @@ const OptionsModule = (function() {
             options.numberFormat = savedOptions.numberFormat || 'basic';
             options.autoGatherEnabled = savedOptions.autoGatherEnabled !== undefined ? savedOptions.autoGatherEnabled : true;
             options.autoBuyEnabled = savedOptions.autoBuyEnabled !== undefined ? savedOptions.autoBuyEnabled : true;
+            options.autocastSpellsEnabled = savedOptions.autocastSpellsEnabled !== undefined ? savedOptions.autocastSpellsEnabled : true;
+            options.autoWellEnabled = savedOptions.autoWellEnabled !== undefined ? savedOptions.autoWellEnabled : true;
 
             // Update checkboxes to match loaded options
             const soundCheckbox = document.getElementById('option-sound');
@@ -285,6 +311,8 @@ const OptionsModule = (function() {
             const numberFormatSelect = document.getElementById('option-number-format');
             const autoGatherCheckbox = document.getElementById('option-auto-gather');
             const autoBuyCheckbox = document.getElementById('option-auto-buy');
+            const autocastSpellsCheckbox = document.getElementById('option-autocast-spells');
+            const autoWellCheckbox = document.getElementById('option-auto-well');
 
             if (soundCheckbox) soundCheckbox.checked = options.soundEnabled;
             if (notificationsCheckbox) notificationsCheckbox.checked = options.notificationsEnabled;
@@ -293,6 +321,8 @@ const OptionsModule = (function() {
             if (numberFormatSelect) numberFormatSelect.value = options.numberFormat;
             if (autoGatherCheckbox) autoGatherCheckbox.checked = options.autoGatherEnabled;
             if (autoBuyCheckbox) autoBuyCheckbox.checked = options.autoBuyEnabled;
+            if (autocastSpellsCheckbox) autocastSpellsCheckbox.checked = options.autocastSpellsEnabled;
+            if (autoWellCheckbox) autoWellCheckbox.checked = options.autoWellEnabled;
 
             // Sync SoundModule with loaded options
             if (typeof SoundModule !== 'undefined') {
