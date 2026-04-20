@@ -2,6 +2,11 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '2.1',
+            date: '04-20-26',
+            summary: `Challenges rewritten to behave the way they were always meant to. Starting a challenge now prestiges your run: pending Mana Crystals are claimed, Mana/buildings/upgrades reset, and the challenge's restriction applies from the first tap. No more activating a challenge and instantly completing it with your existing stockpile. Reach the goal to earn the permanent reward; abandon at any time for none. Prestige upgrades, Transcendence, and completed-challenge bonuses carry through as usual.`
+        },
+        {
             version: '2.0',
             date: '04-20-26',
             summary: `Reshaping the game closer to the original vision.

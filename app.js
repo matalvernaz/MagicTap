@@ -1,4 +1,4 @@
-const VERSION = '2.0';
+const VERSION = '2.1';
 
 let mana = 0;
 let manaPerClick = 1;

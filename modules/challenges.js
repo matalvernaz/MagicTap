@@ -91,7 +91,7 @@ const ChallengesModule = (function() {
         <section id="challenges-panel" class="game-panel" hidden>
             <h2 id="challenges-heading" tabindex="-1">Ascension Challenges</h2>
             <div id="challenges-container" aria-labelledby="challenges-heading">
-                <p class="challenges-info">Complete challenges during prestige runs for permanent bonuses. Select a challenge, then prestige to begin.</p>
+                <p class="challenges-info">Each challenge is a fresh run played under a specific restriction. Starting one prestiges your current run (claiming any pending Mana Crystals), resets Mana, buildings, and upgrades, and applies the challenge's rules. Reach the goal to earn a permanent bonus; abandon at any time for none.</p>
                 <div id="active-challenge-display" hidden>
                     <div class="active-challenge-banner" role="status">
                         <p><strong>Active Challenge:</strong> <span id="active-challenge-name"></span></p>
@@ -122,7 +122,7 @@ const ChallengesModule = (function() {
 
         const hasPrestiged = typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() > 0;
         if (!hasPrestiged) {
-            container.innerHTML = '<p class="locked-message">You must prestige at least once before activating challenges.</p>';
+            container.innerHTML = '<p class="locked-message">Complete one prestige run first. Challenges replace the normal reset with a themed restriction.</p>';
             return;
         }
 
@@ -144,7 +144,7 @@ const ChallengesModule = (function() {
                 <p class="challenge-restriction">${challenge.restriction}</p>
                 <p class="challenge-reward">Reward: ${challenge.reward}</p>
                 ${isActive ? '<p class="challenge-active-label">Currently Active</p>' : ''}
-                ${canStart ? `<button class="start-challenge-button" data-challenge-id="${challenge.id}" aria-label="Start ${challenge.name} challenge. ${challenge.description}">Start Challenge</button>` : ''}
+                ${canStart ? `<button class="start-challenge-button" data-challenge-id="${challenge.id}" aria-label="Start ${challenge.name} challenge. This resets your run and applies the restriction. ${challenge.description}">Start (resets run)</button>` : ''}
             `;
 
             container.appendChild(div);
@@ -166,8 +166,15 @@ const ChallengesModule = (function() {
         if (!challenge || challenge.isCompleted || activeChallenge) return;
 
         // Challenges require at least one prestige to activate
-        if (typeof PrestigeModule !== 'undefined' && PrestigeModule.getTimesPrestiged() < 1) return;
+        if (typeof PrestigeModule === 'undefined' || PrestigeModule.getTimesPrestiged() < 1) return;
 
+        // Starting a challenge IS a prestige run. Claim pending crystals and
+        // wipe run state so the challenge begins from a clean slate — this is
+        // what prevents the "activate and instantly complete" exploit.
+        PrestigeModule.performRunReset();
+
+        // resetForPrestige clears activeChallenge via ChallengesModule.resetForPrestige,
+        // so set the challenge AFTER the reset runs.
         activeChallenge = challenge;
         challengeStartTime = Date.now();
         challengeElapsed = 0;
@@ -179,13 +186,13 @@ const ChallengesModule = (function() {
             if (notificationArea) {
                 const announcement = document.createElement('span');
                 announcement.className = 'sr-only';
-                announcement.textContent = `Challenge started: ${challenge.name}. ${challenge.restriction}`;
+                announcement.textContent = `Challenge started: ${challenge.name}. Run reset. ${challenge.restriction}`;
                 notificationArea.appendChild(announcement);
                 setTimeout(() => announcement.remove(), 3000);
             }
         }
 
-        // Apply restrictions
+        // Apply restrictions on top of the reset state
         if (typeof recalculateMPS === 'function') recalculateMPS();
         if (typeof renderBuildings === 'function') renderBuildings();
 

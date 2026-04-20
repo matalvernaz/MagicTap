@@ -543,6 +543,32 @@ const PrestigeModule = (function() {
         return prestigeUnlocked;
     }
 
+    // Shared reset path used by both "Reset (Start New Run)" after browsing the
+    // store and by starting a Challenge from the Challenges panel. Awards any
+    // pending crystals, increments the prestige count, and hands off to the
+    // global resetForPrestige that wipes run state.
+    function performRunReset() {
+        const stats = StatisticsModule.getStats();
+        const totalMana = stats.manaTotal;
+        const totalCrystalsFromMana = calculateManaCrystals(totalMana);
+        const pendingCrystals = Math.max(0, totalCrystalsFromMana - totalManaCrystalsEarned);
+
+        if (pendingCrystals > 0) {
+            manaCrystals += pendingCrystals;
+            totalManaCrystalsEarned += pendingCrystals;
+        }
+        crystalsSpentThisSession = 0;
+        timesPrestiged++;
+
+        if (typeof SoundModule !== 'undefined') {
+            SoundModule.play('exitPrestige');
+        }
+
+        if (typeof resetForPrestige === 'function') {
+            resetForPrestige();
+        }
+    }
+
     function updateDisplay() {
         const stats = StatisticsModule.getStats();
         const totalMana = stats.manaTotal;
@@ -953,6 +979,7 @@ const PrestigeModule = (function() {
         shouldShowPrestige,
         unlockPrestige,
         isPrestigeUnlocked,
+        performRunReset,
         renderPrestigeUpgrades,
         applyAllPrestigeBuildingBoosts,
         applyAllPrestigeBonuses,
