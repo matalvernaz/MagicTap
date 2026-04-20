@@ -5,6 +5,7 @@ const PrestigeModule = (function() {
     let totalManaCrystalsEarned = 0;  // Total ever earned (for prestige level)
     let bonusPrestigeLevels = 0;  // Bonus levels from upgrades (shown as pending)
     let timesPrestiged = 0;
+    let prestigeUnlocked = false;  // Set by the "Break the Veil" main-store upgrade chain
     let isInPrestigeStore = false;
     let crystalsSpentThisSession = 0; // Track crystals spent for refund
     let prestigePotentialUnlocked = 0; // Percentage of prestige power unlocked THIS RUN (0-100)
@@ -12,7 +13,6 @@ const PrestigeModule = (function() {
 
     // Constants (Cookie Clicker formula)
     const PRESTIGE_BASE = 1e12;  // 1 trillion mana for first Mana Crystal
-    const PRESTIGE_UNLOCK_THRESHOLD = 1e9;  // 1 billion mana to see prestige button (first run)
 
     // Prestige Upgrades (permanent upgrades bought with Mana Crystals)
     // Ordered by cost for progressive unlocking
@@ -155,6 +155,17 @@ const PrestigeModule = (function() {
             isPurchased: false,
             unlockCost: 0,
             requiresUpgrade: 'arcane-auto-gather'
+        },
+        {
+            id: 'ranking-insight',
+            name: "Initiate's Insight",
+            description: 'Unlocks the Ranking Upgrades line in the main upgrade store (Wizardries, Familiars, and Enchantments, each gated by your wizard rank).',
+            flavorText: 'You begin to see the hidden structure of the craft — and the wizards, enchanters, and familiars you could one day become or command.',
+            cost: 8,
+            isRankingUnlock: true,
+            isPurchased: false,
+            unlockCost: 0,
+            requiresUpgrade: 'spell-core'
         }
     ];
 
@@ -519,8 +530,17 @@ const PrestigeModule = (function() {
     }
 
     function shouldShowPrestige() {
-        const stats = StatisticsModule.getStats();
-        return timesPrestiged > 0 || stats.manaTotal >= PRESTIGE_UNLOCK_THRESHOLD;
+        // Prestige is now unlocked by completing the "Path to Ascension" upgrade
+        // chain in the main store. Already-prestiged saves remain visible.
+        return prestigeUnlocked || timesPrestiged > 0;
+    }
+
+    function unlockPrestige() {
+        prestigeUnlocked = true;
+    }
+
+    function isPrestigeUnlocked() {
+        return prestigeUnlocked;
     }
 
     function updateDisplay() {
@@ -657,6 +677,7 @@ const PrestigeModule = (function() {
             '#events-log',
             '#upgrades-heading',
             '#upgrades-container',
+            '#ranking-upgrades-inline',
             '#buildings-heading',
             '#buildings-container',
             '#purchased-upgrades-panel'
@@ -816,6 +837,7 @@ const PrestigeModule = (function() {
             totalManaCrystalsEarned,
             bonusPrestigeLevels,
             timesPrestiged,
+            prestigeUnlocked,
             isInPrestigeStore,
             prestigePotentialUnlocked,
             highestPotentialTierPurchased,
@@ -832,6 +854,10 @@ const PrestigeModule = (function() {
             totalManaCrystalsEarned = data.totalManaCrystalsEarned || 0;
             bonusPrestigeLevels = data.bonusPrestigeLevels || 0;
             timesPrestiged = data.timesPrestiged || 0;
+            // Grandfather saves that pre-date the unlock flag but had already been prestiging.
+            prestigeUnlocked = data.prestigeUnlocked !== undefined
+                ? data.prestigeUnlocked
+                : (data.timesPrestiged || 0) > 0;
             isInPrestigeStore = data.isInPrestigeStore || false;
             prestigePotentialUnlocked = data.prestigePotentialUnlocked || 0;
             highestPotentialTierPurchased = data.highestPotentialTierPurchased || 0;
@@ -899,6 +925,11 @@ const PrestigeModule = (function() {
         return upgrade && upgrade.isPurchased;
     }
 
+    function hasRankingInsight() {
+        const upgrade = prestigeUpgrades.find(u => u.id === 'ranking-insight');
+        return upgrade && upgrade.isPurchased;
+    }
+
     function getPrestigeUpgrades() {
         return prestigeUpgrades;
     }
@@ -920,6 +951,8 @@ const PrestigeModule = (function() {
         manaForCrystals,
         isPrestigeMode,
         shouldShowPrestige,
+        unlockPrestige,
+        isPrestigeUnlocked,
         renderPrestigeUpgrades,
         applyAllPrestigeBuildingBoosts,
         applyAllPrestigeBonuses,
@@ -931,6 +964,7 @@ const PrestigeModule = (function() {
         hasSpellRegenBoost,
         hasWellBoost,
         hasAutoBuy,
+        hasRankingInsight,
         addPrestigePotential,
         getPrestigePotential,
         getHighestPotentialTier,

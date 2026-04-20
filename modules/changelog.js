@@ -2,6 +2,13 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '2.0',
+            date: '04-20-26',
+            summary: `Reshaping the game closer to the original vision.
+Ranking Upgrades have moved out of their own panel and into a new "Ranking Upgrades" line within the main upgrade store. They are now gated behind a new prestige upgrade, Initiate's Insight (8 Mana Crystals, requires Spell Core).
+Prestige is no longer unlocked by a raw mana threshold. Instead, a new three-step "Path to Ascension" upgrade chain appears in the main store — Whisper of Ascension, Path of the Ascendant, and Break the Veil — and purchasing the final one unlocks the Prestige panel. Existing saves that had already prestiged keep access immediately.`
+        },
+        {
             version: '1.9',
             date: '04-20-26',
             summary: `Added Options toggles for the two Transcendence automations: Eternal Cantrip (autocast spells) and Prolific Wish (auto-trigger the Wishing Well). Turn them off per run if you want to manage spells or the well by hand without refunding the Essence.`

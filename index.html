@@ -33,6 +33,23 @@
         <h2 id="upgrades-heading" style="display: none;">Upgrades</h2>
         <section id="upgrades-container" style="display: none;"></section>
 
+        <section id="ranking-upgrades-inline" aria-labelledby="ranking-upgrades-inline-heading" hidden>
+            <h3 id="ranking-upgrades-inline-heading" tabindex="-1">Ranking Upgrades</h3>
+            <p class="ranking-info">Unlocked by achievements and your wizard rank. Wizardries deepen your craft, Familiars bind allies, Enchantments shape the weave.</p>
+            <div class="ranking-category" id="wizardries-section">
+                <h4>Wizardries <span class="unlock-info">(Unlocks at Initiate)</span></h4>
+                <div id="wizardries-list" class="ranking-upgrades-list"></div>
+            </div>
+            <div class="ranking-category" id="familiars-section">
+                <h4>Familiars <span class="unlock-info">(Unlocks at Novice)</span></h4>
+                <div id="familiars-list" class="ranking-upgrades-list"></div>
+            </div>
+            <div class="ranking-category" id="enchantments-section">
+                <h4>Enchantments <span class="unlock-info">(Unlocks at Journeyman)</span></h4>
+                <div id="enchantments-list" class="ranking-upgrades-list"></div>
+            </div>
+        </section>
+
         <h2 id="buildings-heading" style="display: none;">Buildings</h2>
         <section id="buildings-container" style="display: none;"></section>
 
@@ -53,7 +70,6 @@
             <button id="statistics-button">Statistics</button>
             <button id="achievements-button">Achievements</button>
             <button id="upgrades-button" style="display: none;">Upgrades</button>
-            <button id="ranking-upgrades-button" style="display: none;">Ranking Upgrades</button>
             <button id="production-button" style="display: none;">Production</button>
             <button id="prestige-button" style="display: none;">Prestige</button>
             <button id="challenges-button" style="display: none;">Challenges</button>

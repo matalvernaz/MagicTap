@@ -1,4 +1,4 @@
-const VERSION = '1.9';
+const VERSION = '2.0';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -1957,6 +1957,48 @@ const upgrades = [
         isUnlocked: false,
         element: null
     },
+    // --- Path to Ascension: the upgrade chain that unlocks Prestige ---
+    // Hidden entirely once Prestige has been unlocked (including on post-reset runs).
+    {
+        id: 'whisper-of-ascension',
+        name: 'Whisper of Ascension',
+        description: 'Increases Mana per second by 5%.',
+        flavorText: 'You hear it at the edge of every spell — a voice that is yours, and not yours, asking how far you will rise.',
+        cost: 25000000,
+        effect: () => { mpsUpgradeMultiplier *= 1.05; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => mana >= 10000000 && !(typeof PrestigeModule !== 'undefined' && PrestigeModule.isPrestigeUnlocked && PrestigeModule.isPrestigeUnlocked()),
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'path-of-the-ascendant',
+        name: 'Path of the Ascendant',
+        description: 'Increases Mana per second by 10%.',
+        flavorText: 'Every great wizard walks this road. Most of them only recognize it in hindsight.',
+        cost: 250000000,
+        effect: () => { mpsUpgradeMultiplier *= 1.10; recalculateMPS(); },
+        isPurchased: false,
+        unlockCondition: () => upgrades.find(u => u.id === 'whisper-of-ascension')?.isPurchased && !(typeof PrestigeModule !== 'undefined' && PrestigeModule.isPrestigeUnlocked && PrestigeModule.isPrestigeUnlocked()),
+        isUnlocked: false,
+        element: null
+    },
+    {
+        id: 'break-the-veil',
+        name: 'Break the Veil',
+        description: 'Unlocks Prestige. Begin cycles of ascension — reset your run for Mana Crystals and permanent upgrades.',
+        flavorText: 'The world you knew was a single page. You hold the book.',
+        cost: 1000000000,
+        effect: () => {
+            if (typeof PrestigeModule !== 'undefined' && typeof PrestigeModule.unlockPrestige === 'function') {
+                PrestigeModule.unlockPrestige();
+            }
+        },
+        isPurchased: false,
+        unlockCondition: () => upgrades.find(u => u.id === 'path-of-the-ascendant')?.isPurchased && !(typeof PrestigeModule !== 'undefined' && PrestigeModule.isPrestigeUnlocked && PrestigeModule.isPrestigeUnlocked()),
+        isUnlocked: false,
+        element: null
+    },
 ];
 
 // --- Helper Functions ---
@@ -2700,7 +2742,6 @@ function setupNavigation() {
         'statistics-button': document.getElementById('statistics-panel'),
         'achievements-button': document.getElementById('achievements-panel'),
         'upgrades-button': purchasedUpgradesPanel,
-        'ranking-upgrades-button': document.getElementById('ranking-upgrades-panel'),
         'production-button': document.getElementById('production-panel'),
         'prestige-button': document.getElementById('prestige-panel'),
         'challenges-button': document.getElementById('challenges-panel'),
@@ -2726,8 +2767,6 @@ function setupNavigation() {
                     StatisticsModule.updateDisplay();
                 } else if (panel.id === 'production-panel') {
                     ProductionModule.updateDisplay(buildings);
-                } else if (panel.id === 'ranking-upgrades-panel') {
-                    RankingUpgradesModule.renderUpgrades();
                 } else if (panel.id === 'wishing-well-panel') {
                     WishingWellModule.updateDisplay();
                     WishingWellModule.renderEffects();
@@ -2755,14 +2794,22 @@ function updateSpellcastingButton() {
     }
 }
 
-// Check if Ranking Upgrades button should be visible
-function updateRankingUpgradesButton() {
-    const rankingButton = document.getElementById('ranking-upgrades-button');
-    if (rankingButton && typeof RankingUpgradesModule !== 'undefined') {
-        // Show button once the player has enough achievements for the first wizardry (Initiate rank)
-        if (AchievementsModule.getEarnedCount() >= RankingUpgradesModule.getMinAchievementsForItem('wizardries', 0)) {
-            rankingButton.style.display = '';
+// Show or hide the inline Ranking Upgrades section based on the prestige unlock.
+function updateRankingUpgradesVisibility() {
+    const inline = document.getElementById('ranking-upgrades-inline');
+    if (!inline) return;
+    const unlocked = typeof PrestigeModule !== 'undefined'
+        && typeof PrestigeModule.hasRankingInsight === 'function'
+        && PrestigeModule.hasRankingInsight();
+    if (unlocked) {
+        if (inline.hidden) {
+            inline.hidden = false;
+            if (typeof RankingUpgradesModule !== 'undefined') {
+                RankingUpgradesModule.renderUpgrades();
+            }
         }
+    } else {
+        inline.hidden = true;
     }
 }
 
@@ -2939,7 +2986,7 @@ function gameLoop() {
         checkUnlocks();
 
         // Update button visibility
-        updateRankingUpgradesButton();
+        updateRankingUpgradesVisibility();
         updateSpellcastingButton();
 
         // Update challenges (progress check, timer)
@@ -3288,7 +3335,6 @@ document.addEventListener('keydown', (e) => {
         's': 'statistics-button',
         'a': 'achievements-button',
         'u': 'upgrades-button',
-        'r': 'ranking-upgrades-button',
         'd': 'production-button',
         'p': 'prestige-button',
         'c': 'challenges-button',

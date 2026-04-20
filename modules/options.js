@@ -89,7 +89,6 @@ const OptionsModule = (function() {
                         <li><kbd>S</kbd> Statistics</li>
                         <li><kbd>A</kbd> Achievements</li>
                         <li><kbd>U</kbd> Purchased Upgrades</li>
-                        <li><kbd>R</kbd> Ranking Upgrades</li>
                         <li><kbd>D</kbd> Production</li>
                         <li><kbd>P</kbd> Prestige</li>
                         <li><kbd>C</kbd> Challenges</li>

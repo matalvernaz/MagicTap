@@ -649,8 +649,12 @@ h2:focus {
     border-color: #ff8c00;
 }
 
-/* Ranking Upgrades Panel */
-#ranking-upgrades-panel .ranking-info {
+/* Ranking Upgrades (inline, inside the main upgrade list) */
+#ranking-upgrades-inline {
+    margin-top: 2em;
+}
+
+#ranking-upgrades-inline .ranking-info {
     margin-bottom: 1.5em;
     color: #aaa;
     font-style: italic;
@@ -660,7 +664,8 @@ h2:focus {
     margin-bottom: 2em;
 }
 
-.ranking-category h3 {
+.ranking-category h3,
+.ranking-category h4 {
     border-bottom: 1px solid #444;
     padding-bottom: 0.5em;
     margin-bottom: 1em;

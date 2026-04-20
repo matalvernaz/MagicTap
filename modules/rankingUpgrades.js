@@ -249,29 +249,10 @@ const RankingUpgradesModule = (function() {
         return true;
     }
 
+    // Ranking upgrades live inline under the main upgrade list (see index.html).
+    // getHTML returns empty so the module doesn't inject a separate panel.
     function getHTML() {
-        return `
-        <section id="ranking-upgrades-panel" class="game-panel" hidden>
-            <h2 id="ranking-upgrades-heading" tabindex="-1">Ranking Upgrades</h2>
-            <div id="ranking-upgrades-container" aria-labelledby="ranking-upgrades-heading">
-                <p class="ranking-info">Unlock new upgrades by earning achievements and advancing your wizard rank!</p>
-
-                <div class="ranking-category" id="wizardries-section">
-                    <h3>Wizardries <span class="unlock-info">(Unlocks at Initiate)</span></h3>
-                    <div id="wizardries-list" class="ranking-upgrades-list"></div>
-                </div>
-
-                <div class="ranking-category" id="familiars-section">
-                    <h3>Familiars <span class="unlock-info">(Unlocks at Novice)</span></h3>
-                    <div id="familiars-list" class="ranking-upgrades-list"></div>
-                </div>
-
-                <div class="ranking-category" id="enchantments-section">
-                    <h3>Enchantments <span class="unlock-info">(Unlocks at Journeyman)</span></h3>
-                    <div id="enchantments-list" class="ranking-upgrades-list"></div>
-                </div>
-            </div>
-        </section>`;
+        return '';
     }
 
     function renderUpgrades() {
@@ -287,7 +268,7 @@ const RankingUpgradesModule = (function() {
     // re-render so the player doesn't have to leave and re-enter the panel.
     let _lastKnownAchCount = -1;
     function refreshAffordability() {
-        const panel = document.getElementById('ranking-upgrades-panel');
+        const panel = document.getElementById('ranking-upgrades-inline');
         if (!panel || panel.hidden) return;
 
         // If achievement count changed, new items may have unlocked — full re-render
