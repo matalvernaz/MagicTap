@@ -2,6 +2,13 @@
 const ChangelogModule = (function() {
     const changelog = [
         {
+            version: '1.8',
+            date: '04-20-26',
+            summary: `Prestige Store is no longer a trap — you can open it without pending crystals (to spend existing ones), and a new "Return to Run" button lets you leave the store without resetting your run. The prestige panel text now accurately explains the flow.
+"Bonus Prestige Level" upgrades (Mana-Touched through One With The Weave) now actually do something: each Prestige Level grants a flat +1% MPS on top of the upgrade's own +2%, and the MPS display now shows the real effective prestige bonus instead of a misleading raw level count.
+Added Automation toggles in the Options panel — you can now disable Arcane Auto-Gather and Arcane Automation without refunding the prestige upgrades, handy if you want to hand-pick your ranking upgrade order for a run.`
+        },
+        {
             version: '1.7',
             date: '04-16-26',
             summary: `Achievements panel now has a "Show locked achievements (spoilers)" toggle that lists all unearned achievements with their descriptions, so you can see exactly what you're missing.

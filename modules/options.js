@@ -6,7 +6,9 @@ const OptionsModule = (function() {
         autoSaveEnabled: true,
         autoSaveInterval: 30,
         truncateLargeNumbers: false,
-        numberFormat: 'basic' // 'basic' or 'scientific'
+        numberFormat: 'basic', // 'basic' or 'scientific'
+        autoGatherEnabled: true, // overrides Arcane Auto-Gather prestige upgrade
+        autoBuyEnabled: true     // overrides Arcane Automation prestige upgrade
     };
 
     function getHTML() {
@@ -39,6 +41,18 @@ const OptionsModule = (function() {
                     <label class="option-item">
                         <input type="checkbox" id="option-autosave" checked>
                         Enable Auto-Save
+                    </label>
+                </div>
+                <div class="option-group">
+                    <h3>Automation</h3>
+                    <p class="option-help">These toggles override prestige automation upgrades. Turn them off if you want to manage buildings or gather mana yourself this run.</p>
+                    <label class="option-item">
+                        <input type="checkbox" id="option-auto-gather" checked>
+                        Enable Arcane Auto-Gather (auto-click once per second)
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="option-auto-buy" checked>
+                        Enable Arcane Automation (auto-buy cheapest upgrade &amp; building every 3 seconds)
                     </label>
                 </div>
                 <div class="option-group">
@@ -124,6 +138,22 @@ const OptionsModule = (function() {
         if (autosaveCheckbox) {
             autosaveCheckbox.addEventListener('change', (e) => {
                 options.autoSaveEnabled = e.target.checked;
+            });
+        }
+
+        // Automation toggles
+        const autoGatherCheckbox = document.getElementById('option-auto-gather');
+        const autoBuyCheckbox = document.getElementById('option-auto-buy');
+
+        if (autoGatherCheckbox) {
+            autoGatherCheckbox.addEventListener('change', (e) => {
+                options.autoGatherEnabled = e.target.checked;
+            });
+        }
+
+        if (autoBuyCheckbox) {
+            autoBuyCheckbox.addEventListener('change', (e) => {
+                options.autoBuyEnabled = e.target.checked;
             });
         }
 
@@ -244,6 +274,8 @@ const OptionsModule = (function() {
             options.autoSaveInterval = savedOptions.autoSaveInterval || 30;
             options.truncateLargeNumbers = savedOptions.truncateLargeNumbers !== undefined ? savedOptions.truncateLargeNumbers : false;
             options.numberFormat = savedOptions.numberFormat || 'basic';
+            options.autoGatherEnabled = savedOptions.autoGatherEnabled !== undefined ? savedOptions.autoGatherEnabled : true;
+            options.autoBuyEnabled = savedOptions.autoBuyEnabled !== undefined ? savedOptions.autoBuyEnabled : true;
 
             // Update checkboxes to match loaded options
             const soundCheckbox = document.getElementById('option-sound');
@@ -251,12 +283,16 @@ const OptionsModule = (function() {
             const autosaveCheckbox = document.getElementById('option-autosave');
             const truncateCheckbox = document.getElementById('option-truncate');
             const numberFormatSelect = document.getElementById('option-number-format');
+            const autoGatherCheckbox = document.getElementById('option-auto-gather');
+            const autoBuyCheckbox = document.getElementById('option-auto-buy');
 
             if (soundCheckbox) soundCheckbox.checked = options.soundEnabled;
             if (notificationsCheckbox) notificationsCheckbox.checked = options.notificationsEnabled;
             if (autosaveCheckbox) autosaveCheckbox.checked = options.autoSaveEnabled;
             if (truncateCheckbox) truncateCheckbox.checked = options.truncateLargeNumbers;
             if (numberFormatSelect) numberFormatSelect.value = options.numberFormat;
+            if (autoGatherCheckbox) autoGatherCheckbox.checked = options.autoGatherEnabled;
+            if (autoBuyCheckbox) autoBuyCheckbox.checked = options.autoBuyEnabled;
 
             // Sync SoundModule with loaded options
             if (typeof SoundModule !== 'undefined') {

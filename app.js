@@ -1,4 +1,4 @@
-const VERSION = '1.7';
+const VERSION = '1.8';
 
 let mana = 0;
 let manaPerClick = 1;
@@ -804,7 +804,7 @@ const upgrades = [
     {
         id: 'mana-touched',
         name: 'Mana-Touched',
-        description: 'Gain +1 bonus prestige level and +2% Mana per second.',
+        description: 'Gain +2% Mana per second, plus +1 Prestige Level (each level adds +1% MPS).',
         flavorText: 'The mana has begun to seep into your very being.',
         cost: 100000000000,
         effect: () => { PrestigeModule.addBonusPrestigeLevel(1); mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
@@ -816,7 +816,7 @@ const upgrades = [
     {
         id: 'mana-drenched',
         name: 'Mana-Drenched',
-        description: 'Gain +1 bonus prestige level and +2% Mana per second.',
+        description: 'Gain +2% Mana per second, plus +1 Prestige Level (each level adds +1% MPS).',
         flavorText: 'You are drenched with arcane energy.',
         cost: 500000000000,
         effect: () => { PrestigeModule.addBonusPrestigeLevel(1); mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
@@ -828,7 +828,7 @@ const upgrades = [
     {
         id: 'mana-saturated',
         name: 'Mana-Saturated',
-        description: 'Gain +1 bonus prestige level and +2% Mana per second.',
+        description: 'Gain +2% Mana per second, plus +1 Prestige Level (each level adds +1% MPS).',
         flavorText: 'You are saturated with arcane energy.',
         cost: 2000000000000,
         effect: () => { PrestigeModule.addBonusPrestigeLevel(1); mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
@@ -840,7 +840,7 @@ const upgrades = [
     {
         id: 'mana-gorged',
         name: 'Mana-Gorged',
-        description: 'Gain +1 bonus prestige level and +2% Mana per second.',
+        description: 'Gain +2% Mana per second, plus +1 Prestige Level (each level adds +1% MPS).',
         flavorText: 'You have consumed more mana than any mortal should.',
         cost: 10000000000000,
         effect: () => { PrestigeModule.addBonusPrestigeLevel(1); mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
@@ -852,7 +852,7 @@ const upgrades = [
     {
         id: 'mana-warped',
         name: 'Mana-Warped',
-        description: 'Gain +1 bonus prestige level and +2% Mana per second.',
+        description: 'Gain +2% Mana per second, plus +1 Prestige Level (each level adds +1% MPS).',
         flavorText: 'The mana has changed you, reshaping your essence.',
         cost: 50000000000000,
         effect: () => { PrestigeModule.addBonusPrestigeLevel(1); mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
@@ -864,7 +864,7 @@ const upgrades = [
     {
         id: 'mana-empowered',
         name: 'Mana-Empowered',
-        description: 'Gain +1 bonus prestige level and +2% Mana per second.',
+        description: 'Gain +2% Mana per second, plus +1 Prestige Level (each level adds +1% MPS).',
         flavorText: 'Raw magical power courses through your veins.',
         cost: 250000000000000,
         effect: () => { PrestigeModule.addBonusPrestigeLevel(1); mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
@@ -876,7 +876,7 @@ const upgrades = [
     {
         id: 'one-with-the-weave',
         name: 'One With The Weave',
-        description: 'Gain +1 bonus prestige level and +2% Mana per second.',
+        description: 'Gain +2% Mana per second, plus +1 Prestige Level (each level adds +1% MPS).',
         flavorText: 'You have become one with the fabric of magic itself.',
         cost: 1000000000000000,
         effect: () => { PrestigeModule.addBonusPrestigeLevel(1); mpsUpgradeMultiplier *= 1.02; recalculateMPS(); },
@@ -2146,11 +2146,13 @@ function getTimeUntilAffordable(cost) {
 function updateDisplay() {
     // Show effective MPS with prestige bonus
     const effectiveMPS = typeof getEffectiveMPS === 'function' ? getEffectiveMPS() : manaPerSecond;
-    const prestigeBonus = typeof PrestigeModule !== 'undefined' ? PrestigeModule.getPrestigeLevel() : 0;
+    // Show the real prestige multiplier (crystals * potential + bonus levels), not the raw level count.
+    const prestigeMultiplier = typeof PrestigeModule !== 'undefined' ? PrestigeModule.getPrestigeMultiplier() : 1;
+    const prestigeBonusPercent = (prestigeMultiplier - 1) * 100;
 
     manaDisplay.textContent = `${OptionsModule.formatNumber(Math.floor(mana))} Mana`;
-    if (prestigeBonus > 0) {
-        mpsDisplay.textContent = `${OptionsModule.formatNumber(effectiveMPS)} MPS (+${prestigeBonus}%)`;
+    if (prestigeBonusPercent > 0) {
+        mpsDisplay.textContent = `${OptionsModule.formatNumber(effectiveMPS)} MPS (+${prestigeBonusPercent.toFixed(1)}% prestige)`;
     } else {
         mpsDisplay.textContent = `${OptionsModule.formatNumber(effectiveMPS)} MPS`;
     }
@@ -2897,8 +2899,9 @@ function gameLoop() {
     }
     StatisticsModule.setCurrentMana(mana);
 
-    // Auto-clicker from prestige upgrade (1 click per second)
-    if (PrestigeModule.hasAutoClicker && PrestigeModule.hasAutoClicker()) {
+    // Auto-clicker from prestige upgrade (1 click per second), respecting the options toggle
+    const autoGatherEnabled = typeof OptionsModule === 'undefined' || OptionsModule.getOptions().autoGatherEnabled !== false;
+    if (autoGatherEnabled && PrestigeModule.hasAutoClicker && PrestigeModule.hasAutoClicker()) {
         autoClickerAccum += deltaSeconds;
         while (autoClickerAccum >= 1) {
             autoClickerAccum -= 1;
@@ -2916,8 +2919,9 @@ function gameLoop() {
         }
     }
 
-    // Auto-buy from prestige upgrade (every 3 seconds)
-    if (PrestigeModule.hasAutoBuy && PrestigeModule.hasAutoBuy()) {
+    // Auto-buy from prestige upgrade (every 3 seconds), respecting the options toggle
+    const autoBuyEnabled = typeof OptionsModule === 'undefined' || OptionsModule.getOptions().autoBuyEnabled !== false;
+    if (autoBuyEnabled && PrestigeModule.hasAutoBuy && PrestigeModule.hasAutoBuy()) {
         autoBuyAccum += deltaSeconds;
         while (autoBuyAccum >= 3) {
             autoBuyAccum -= 3;
